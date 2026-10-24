@@ -1,0 +1,490 @@
+/*
+ * How a node gets paid: the node-hero art on the left with a hexagonal block timer round its core, and
+ * three tier lanes on the right. Each lane is a line of nodes (the front one lit and paid, then it drops
+ * under the row and slides to the back) with the tier's name, the live length of the line, how long a
+ * turn takes to come round and what a turn pays (the whole of it, parallel assets counted in, in the
+ * tier's colour). The art sits at its natural size on the black, so it needs no fade. Solid colour and
+ * hairlines: the timer is a crisp white outline, a lit node is a solid one. No glow, no gradient, no
+ * text shadow.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+
+  /* ---- the node and its timer ------------------------------------------------------------------ */
+
+  .machine {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    justify-items: start;
+    min-inline-size: 0;
+  }
+
+  /*
+   * The picture has black round the node: trim it, so the node is large and shares a height with the lanes.
+   * The ribbons run out to the right edge of the frame; the frame ends where the lanes begin.
+   */
+  .art {
+    position: relative;
+    inline-size: 100%;
+    aspect-ratio: 1.9;
+    /* An aspect ratio does not beat the content's own height unless the minimum is lifted. */
+    min-block-size: 0;
+    /* Trim the black above and below; the ribbons are free to run out to the side. */
+    overflow-x: visible;
+    overflow-y: clip;
+  }
+
+  .scaled {
+    position: relative;
+    inline-size: 118%;
+    margin-inline-start: -8%;
+    margin-block-start: -15%;
+  }
+
+  /*
+   * The timer sits round the node in the art: the core is a third of the way across and just over half
+   * way down. Positioned in the art's own box with physical offsets, because the art does not mirror.
+   */
+  .ring {
+    position: absolute;
+    left: 33%;
+    top: 52%;
+    inline-size: 44%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    overflow: visible;
+  }
+
+  /* White hairlines: the art is bright, so a blue line would vanish into it. Each block lights the outline once. */
+  .ringTrack {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.4);
+    stroke-width: 0.6;
+    stroke-linejoin: round;
+  }
+
+  .ringTrack[data-beat] {
+    animation: beat 900ms var(--ease-out) both;
+  }
+
+  @keyframes beat {
+    from {
+      stroke: rgb(255 255 255 / 0.95);
+    }
+  }
+
+  .ringFill {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.96);
+    stroke-width: 1.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* The resting picture is a closed outline: reduced motion and the moment before it starts. */
+    stroke-dasharray: 100 100;
+  }
+
+  .ring[data-animated] .ringFill {
+    stroke-dasharray: 0.01 100;
+    animation: lap var(--block) linear infinite paused;
+  }
+
+  .ring[data-animated][data-running] .ringFill {
+    animation-play-state: running;
+  }
+
+  @keyframes lap {
+    to {
+      stroke-dasharray: 100 100;
+    }
+  }
+
+  /* ---- the lanes -------------------------------------------------------------------------------- */
+
+  /* A size container: a lane lays itself out by the room the column has, not by the screen. */
+  .right {
+    display: grid;
+    gap: 1rem;
+    min-inline-size: 0;
+    container-type: inline-size;
+  }
+
+  .lanes {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--line-2);
+    min-inline-size: 0;
+  }
+
+  /*
+   * Name and length of the line, the line itself, then how long a turn takes and what it pays, stacked in
+   * the last column. Three rows of this, divided by hairlines.
+   */
+  .lane {
+    --lane-gap: 150ms;
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 9rem) minmax(0, 1fr) minmax(9.5rem, 11rem);
+    grid-template-areas:
+      "head line turn"
+      "head line pay";
+    align-items: center;
+    column-gap: clamp(0.875rem, 0.2rem + 1.7vw, 1.75rem);
+    row-gap: 0;
+    padding-block: clamp(1.1rem, 0.7rem + 1.2vw, 1.9rem);
+    border-block-end: 1px solid var(--line-1);
+  }
+
+  .laneHead {
+    grid-area: head;
+    display: grid;
+    gap: 0.4rem;
+    min-inline-size: 0;
+  }
+
+  .laneHead p {
+    margin: 0;
+  }
+
+  .name {
+    color: var(--tier);
+    font: 600 clamp(1.125rem, 1rem + 0.5vw, 1.375rem) / 1.1 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  .count {
+    color: var(--text-3);
+    font: 400 var(--fs-xs) / 1.3 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- the personal number ------------------------------------------------------------------------ */
+
+  .turn {
+    grid-area: turn;
+    display: grid;
+    gap: 0.3rem;
+    justify-items: start;
+    min-inline-size: 0;
+  }
+
+  .turn p {
+    margin: 0;
+  }
+
+  .turnLead {
+    color: var(--text-3);
+    font: 400 var(--fs-xs) / 1.3 var(--font-sans);
+  }
+
+  .turnValue {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3em;
+    color: var(--text-1);
+    font: 300 clamp(2.25rem, 1.7rem + 1.7vw, 3.25rem) / 1 var(--font-display);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
+
+  .turnUnit {
+    color: var(--text-2);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+    letter-spacing: 0;
+  }
+
+  /* ---- what a turn pays ----------------------------------------------------------------------------- */
+
+  /*
+   * The whole of a turn up front, in the tier's own colour (the node that lit up and sent "+18" off the
+   * line); how it adds up and the day's worth sit under it, quiet.
+   */
+  .pay {
+    grid-area: pay;
+    display: grid;
+    gap: 0.2rem;
+    justify-items: start;
+    min-inline-size: 0;
+    margin-block-start: 0.85rem;
+  }
+
+  .pay p {
+    margin: 0;
+  }
+
+  .payHead {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4em;
+    white-space: nowrap;
+  }
+
+  .payFigure {
+    color: var(--accent-text);
+    font: 600 clamp(1.75rem, 1.4rem + 0.9vw, 2rem) / 1 var(--font-display);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  .payUnit {
+    color: var(--text-2);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+  }
+
+  .paySplit,
+  .payDay {
+    color: var(--text-3);
+    font: 400 var(--fs-xs) / 1.4 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    text-wrap: balance;
+  }
+
+  /* The sum never breaks across a line: only the words after it may drop down. */
+  .sum {
+    white-space: nowrap;
+  }
+
+  /* ---- a line of nodes ---------------------------------------------------------------------------- */
+
+  /* The box is a size container, so the row can work out its own step from the room it is given. */
+  .lineBox {
+    grid-area: line;
+    container-type: inline-size;
+    min-inline-size: 0;
+  }
+
+  .line {
+    --step: calc(100cqw / var(--m));
+    --hex-w: calc(var(--step) * 0.74);
+    --hex-h: calc(var(--hex-w) * 1.1547);
+    --drop: 14px;
+    position: relative;
+    /* Room for the row, the way back under it and the node riding along it. */
+    block-size: calc(var(--hex-h) * 1.5 + var(--drop) + 6px);
+    padding-block-start: 6px;
+  }
+
+  /* The way back: a hairline that leaves the front of the row, runs under it and comes up into the back. */
+  .track {
+    position: absolute;
+    inset-inline: calc(var(--step) / 2);
+    inset-block-start: calc(var(--hex-h) + 6px);
+    block-size: var(--drop);
+    border: 1px solid var(--line-3);
+    border-block-start: 0;
+    border-end-start-radius: 7px;
+    border-end-end-radius: 7px;
+  }
+
+  .slot {
+    position: absolute;
+    inset-block-start: 6px;
+    inset-inline-start: 0;
+    display: grid;
+    place-items: center;
+    inline-size: var(--step);
+    block-size: var(--hex-h);
+    translate: calc(var(--i) * var(--step)) 0;
+    transition: translate 650ms var(--ease-in-out) calc(var(--lane) * var(--lane-gap));
+  }
+
+  .hex {
+    display: block;
+    inline-size: var(--hex-w);
+    block-size: var(--hex-h);
+    background: rgb(var(--accent-rgb) / 0.24);
+    clip-path: var(--hex-clip);
+    transition:
+      background 320ms var(--ease-out),
+      scale 320ms var(--ease-out);
+  }
+
+  /* The front of the line is lit and a little larger. It lights once the line has stepped up to it. */
+  .slot[data-front] .hex {
+    background: var(--accent);
+    scale: 1.28;
+    transition-delay: calc(var(--lane) * var(--lane-gap) + 380ms);
+  }
+
+  /* The node that was just paid drops under the row, rides the way back and comes up at the end of the line. */
+  .hex[data-back] {
+    animation: back 650ms var(--ease-in-out) calc(var(--lane) * var(--lane-gap)) both;
+  }
+
+  @keyframes back {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+
+    30%,
+    70% {
+      translate: 0 calc(var(--hex-h) * 0.5 + var(--drop));
+    }
+  }
+
+  /* What the front of the line was paid, rising off it. */
+  .pop {
+    position: absolute;
+    inset-block-start: -4px;
+    inset-inline-start: calc(var(--step) / 2);
+    translate: -50% 0;
+    color: var(--accent-text);
+    font: 600 var(--fs-sm) / 1 var(--font-mono);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    animation: pop 1900ms var(--ease-out) calc(var(--lane) * var(--lane-gap)) both;
+  }
+
+  @keyframes pop {
+    0% {
+      opacity: 0;
+      translate: -50% 4px;
+    }
+
+    16% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      translate: -50% -24px;
+    }
+  }
+
+  /* ---- the foot ------------------------------------------------------------------------------------ */
+
+  /* Under the lanes: what a payout also earns, and the way to the receipts. */
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .parallel {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7em;
+    flex: 1 1 24rem;
+    margin: 0;
+    /* The global paragraph measure would squeeze the line: let it use the width it has. */
+    max-inline-size: none;
+    color: var(--text-2);
+    font: 400 var(--fs-md) / 1.45 var(--font-sans);
+    text-wrap: pretty;
+  }
+
+  /* The mark sits on the middle of the first line, however many lines the sentence takes. */
+  .parallelMark {
+    display: grid;
+    place-items: center;
+    flex: none;
+    block-size: 1.45em;
+  }
+
+  .parallel b {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  /* ---- layouts ----------------------------------------------------------------------------------- */
+
+  /* Side by side only where the lanes keep a comfortable width: a node in a line is never smaller than a bullet. */
+  @media (min-width: 1400px) {
+    .stage {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.2fr);
+    }
+  }
+
+  /* Stacked: the lanes line up under the art. */
+  @media (max-width: 1399.98px) {
+    .machine,
+    .right {
+      inline-size: min(100%, 44rem);
+      justify-self: center;
+    }
+  }
+
+  @media (max-width: 719.98px) {
+    /* A tighter crop on the phone, out to the screen's edges: the node fills the frame, the ribbons run off the side. */
+    .art {
+      aspect-ratio: 1.45;
+      margin-inline: calc(var(--gutter) * -1);
+      inline-size: calc(100% + var(--gutter) * 2);
+      overflow: clip;
+    }
+
+    .scaled {
+      inline-size: 150%;
+      margin-inline-start: -12%;
+      margin-block-start: -12%;
+    }
+
+    .machine {
+      inline-size: 100%;
+    }
+  }
+
+  /*
+   * Narrow column (a phone): name on the left, the wait on the right, and the line across the whole
+   * width under them, so the nodes stay a readable size.
+   */
+  @container (max-width: 40rem) {
+    .lane {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "head turn"
+        "pay pay"
+        "line line";
+      align-items: start;
+      row-gap: 0.9rem;
+    }
+
+    .turn {
+      justify-items: end;
+      text-align: end;
+    }
+
+    .pay {
+      margin-block-start: 0;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .pop,
+  :global(html[data-motion="reduced"]) .hex[data-back],
+  :global(html[data-motion="reduced"]) .ringTrack[data-beat] {
+    animation: none;
+  }
+
+  :global(html[data-motion="reduced"]) .slot,
+  :global(html[data-motion="reduced"]) .hex {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .pop,
+    :global(html:not([data-motion="full"])) .hex[data-back],
+    :global(html:not([data-motion="full"])) .ringTrack[data-beat] {
+      animation: none;
+    }
+
+    :global(html:not([data-motion="full"])) .slot,
+    :global(html:not([data-motion="full"])) .hex {
+      transition-duration: 0.01ms;
+      transition-delay: 0s;
+    }
+  }
+}

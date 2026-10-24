@@ -1,0 +1,20 @@
+/* The chapter's last row: one hairline above it, then the links. */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .closing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem 1rem;
+    padding-block-start: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  @media (max-width: 719.98px) {
+    .closing {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+}

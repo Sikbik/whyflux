@@ -1,0 +1,48 @@
+/*
+ * The chapter's closing line: large italic type, set on the page and pushed toward the right, with
+ * the three nouns as plain links. No panel, no rule.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .closing {
+    padding-block: clamp(4.5rem, 2.5rem + 8vw, 10rem) calc(var(--section-y) * 0.6);
+    padding-inline-start: clamp(0rem, 40vw - 12rem, 30rem);
+  }
+
+  .line {
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-2);
+    font: italic 400 clamp(2.4rem, 1.2rem + 4.8vw, 5.5rem) / 1.08 var(--font-accent);
+    letter-spacing: -0.02em;
+  }
+
+  .part {
+    display: block;
+  }
+
+  .noun {
+    color: var(--text-1);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgb(var(--accent-rgb) / 0.55);
+    text-underline-offset: 0.16em;
+    transition: text-decoration-color var(--dur-1) var(--ease-out);
+  }
+
+  .noun:hover {
+    text-decoration-color: var(--hot);
+  }
+
+  .noun:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 4px;
+  }
+
+  @media (max-width: 719.98px) {
+    .closing {
+      padding-inline-start: 0;
+    }
+  }
+}

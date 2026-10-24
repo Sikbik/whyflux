@@ -1,0 +1,38 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .ruler {
+    --tc: rgb(var(--accent-rgb) / 0.55);
+    display: block;
+    flex: none;
+    pointer-events: none;
+  }
+
+  .ruler[data-o="horizontal"] {
+    inline-size: var(--len);
+    block-size: 10px;
+    background:
+      repeating-linear-gradient(90deg, var(--tc) 0 1px, transparent 1px calc(var(--step) * 5)) left var(--edge, top) /
+        100% 10px no-repeat,
+      repeating-linear-gradient(90deg, var(--tc) 0 1px, transparent 1px var(--step)) left var(--edge, top) / 100% 5px
+        no-repeat;
+  }
+
+  .ruler[data-o="horizontal"][data-side="end"] {
+    --edge: bottom;
+  }
+
+  .ruler[data-o="vertical"] {
+    block-size: var(--len);
+    inline-size: 10px;
+    background:
+      repeating-linear-gradient(180deg, var(--tc) 0 1px, transparent 1px calc(var(--step) * 5)) var(--edge, left) top /
+        10px 100% no-repeat,
+      repeating-linear-gradient(180deg, var(--tc) 0 1px, transparent 1px var(--step)) var(--edge, left) top / 5px 100%
+        no-repeat;
+  }
+
+  .ruler[data-o="vertical"][data-side="end"] {
+    --edge: right;
+  }
+}

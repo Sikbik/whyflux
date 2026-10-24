@@ -1,0 +1,981 @@
+/*
+ * Chapter 05: Try to take it down. One stage and no frames: the two apps stand side by side on
+ * the page itself, each a name, a word for how it is doing, a number, a map and a line of story.
+ * Solid colour and crisp light only (no gradients, no glow, no boxes). The Flux lane wears the
+ * brand accent; traditional hosting wears steel (data-mood="cold"). Layers, outside in:
+ *   stage   the weapon words, the two lanes, the way out
+ *   lane    head (name, status, failures) / view (canvas) / line (what happened) / deck (its lever)
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .stage {
+    --strike: #c81e3a;
+    --strike-hover: #d92a46;
+    position: relative;
+    display: grid;
+    gap: clamp(1.75rem, 1rem + 2.4vw, 3rem);
+    min-inline-size: 0;
+  }
+
+  .skeleton {
+    min-block-size: clamp(34rem, 52vw, 44rem);
+  }
+
+  /* ---- what to take out ------------------------------------------------------------------------ */
+
+  .rail {
+    display: grid;
+    gap: 0.1rem;
+    min-inline-size: 0;
+  }
+
+  .railRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem 2rem;
+  }
+
+  .weapons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 clamp(1rem, 0.5rem + 1.5vw, 1.75rem);
+    min-inline-size: 0;
+  }
+
+  .lead {
+    color: var(--text-3);
+    font: 400 1.25rem / 1 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  .weapon {
+    position: relative;
+    min-block-size: 44px;
+    padding: 0 0.1rem;
+    color: var(--text-3);
+    font: 600 1.25rem / 1 var(--font-display);
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .weapon::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0.45rem;
+    block-size: 2px;
+    background: var(--alarm);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  .weapon:hover,
+  .weapon[aria-checked="true"] {
+    color: var(--text-1);
+  }
+
+  .weapon[aria-checked="true"]::after {
+    transform: scaleX(1);
+  }
+
+  .weapon[data-ahead]:not(:hover, [aria-checked="true"]) {
+    color: var(--text-4);
+  }
+
+  .weapon:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 4px;
+  }
+
+  .weapon[data-fired] {
+    animation: fired 0.5s var(--ease-snap);
+  }
+
+  @keyframes fired {
+    35% {
+      color: var(--alarm);
+      scale: 1.1;
+    }
+  }
+
+  .railEnd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1.25rem;
+  }
+
+  .echo {
+    min-block-size: 1.5rem;
+    max-inline-size: 64ch;
+    margin: 0;
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.45 var(--font-sans);
+  }
+
+  .echoLink {
+    color: var(--text-2);
+    text-decoration: underline;
+    text-decoration-color: var(--line-3);
+    text-underline-offset: 0.22em;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .echoLink:hover {
+    color: var(--text-1);
+    text-decoration-color: currentColor;
+  }
+
+  .echoLink:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+
+  /* The strike button: one solid slab, two cut corners, the only filled colour on the stage. */
+  .fire {
+    flex: none;
+    color: #fff;
+    font: 600 0.9375rem / 1 var(--font-display);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: scale var(--dur-1) var(--ease-snap);
+  }
+
+  .fireFace {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    min-block-size: 48px;
+    padding: 0 1.25rem;
+    background: var(--strike);
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: background var(--dur-1) var(--ease-out);
+  }
+
+  .fire:hover .fireFace {
+    background: var(--strike-hover);
+  }
+
+  .fire:active {
+    scale: 0.97;
+  }
+
+  .fire:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 3px;
+  }
+
+  .textButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    min-block-size: 44px;
+    padding: 0 0.15rem;
+    color: var(--text-3);
+    font: 500 0.875rem / 1 var(--font-sans);
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .textButton:hover {
+    color: var(--text-1);
+  }
+
+  .textButton:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+
+  /* ---- the lanes ------------------------------------------------------------------------------- */
+
+  .lanes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(1.75rem, 0.5rem + 4vw, 4.25rem);
+    row-gap: 3rem;
+    align-items: start;
+  }
+
+  .lane {
+    container: lane / inline-size;
+    display: grid;
+    align-content: start;
+    row-gap: 0.85rem;
+    min-inline-size: 0;
+    scroll-margin-block-start: calc(var(--nav-h-condensed) + 56px);
+  }
+
+  /* The head: a single rule above the name, the status under it, the score on the right. */
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "name score"
+      "status score";
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    align-items: start;
+    min-block-size: 5.4rem;
+    padding-block-start: 0.9rem;
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .lane[data-lane="flux"] .head {
+    border-block-start: 2px solid var(--accent);
+    padding-block-start: calc(0.9rem - 1px);
+  }
+
+  .name {
+    grid-area: name;
+    margin: 0;
+    color: var(--accent-strong);
+    font: 600 clamp(1.125rem, 1rem + 0.5vw, 1.5rem) / 1.15 var(--font-display);
+    letter-spacing: -0.015em;
+  }
+
+  .status {
+    grid-area: status;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.55rem;
+    margin: 0;
+    color: var(--status-ok);
+    font: 600 0.9375rem / 1.2 var(--font-display);
+  }
+
+  .lane[data-status="failing"] .status {
+    color: var(--status-warn);
+  }
+
+  .lane[data-status="down"] .status {
+    color: var(--alarm);
+  }
+
+  .held {
+    color: var(--text-3);
+    font: 400 0.8125rem / 1.2 var(--font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .score {
+    grid-area: score;
+    display: grid;
+    justify-items: end;
+    align-content: start;
+    margin: 0;
+    text-align: end;
+  }
+
+  .num {
+    color: var(--line-3);
+    font: 300 clamp(3.5rem, 2.4rem + 3.4vw, 5.25rem) / 0.82 var(--font-display);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+    transition: color var(--dur-3) var(--ease-out);
+  }
+
+  .score[data-on] .num {
+    color: var(--text-1);
+    animation: pop 0.42s var(--ease-snap);
+  }
+
+  .lane[data-lane="flux"] .score[data-on] .num {
+    color: var(--accent-strong);
+    font-weight: 600;
+  }
+
+  .score[data-fell] .num {
+    color: var(--alarm);
+  }
+
+  @keyframes pop {
+    from {
+      scale: 1.5;
+      opacity: 0.3;
+    }
+  }
+
+  .unit {
+    margin-block-start: 0.4rem;
+    color: var(--text-3);
+    font: 400 0.8125rem / 1.2 var(--font-sans);
+  }
+
+  /* The map. Its edges are invisible: the dots simply end. */
+  .view {
+    position: relative;
+  }
+
+  .field {
+    position: relative;
+    block-size: clamp(13.5rem, 56cqi, 25rem);
+    cursor: crosshair;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+
+  .targets {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    outline: none;
+  }
+
+  .targets:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
+
+  /* Dark: the map dims, and a stepped flicker of the map itself plays once (no overlay, no box). */
+  .view[data-down] .canvas {
+    opacity: 0.38;
+    animation: blackout 0.62s steps(1, end) 1;
+  }
+
+  @keyframes blackout {
+    0% {
+      opacity: 1;
+    }
+    16% {
+      opacity: 0.15;
+    }
+    32% {
+      opacity: 0.8;
+    }
+    48% {
+      opacity: 0.1;
+    }
+    64% {
+      opacity: 0.6;
+    }
+    80% {
+      opacity: 0.2;
+    }
+  }
+
+  .down {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 3.3rem;
+    z-index: 3;
+    display: grid;
+    justify-items: center;
+    gap: 0.3rem;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .downClock {
+    color: var(--alarm);
+    font: 500 clamp(2.25rem, 1.6rem + 2vw, 3.25rem) / 1 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
+
+  .downReal {
+    color: var(--text-1);
+    font: 500 0.8125rem / 1.3 var(--font-sans);
+  }
+
+  .redeploy {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0.3rem;
+    z-index: 4;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .redeploy > * {
+    pointer-events: auto;
+  }
+
+  .redeploy .textButton {
+    min-block-size: 44px;
+    padding: 0 0.1rem;
+    border-block-end: 1px solid currentColor;
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  /* One line of story, with room for a second so nothing below it moves. */
+  .line {
+    min-block-size: 2.9em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--text-2);
+    font: 400 0.875rem / 1.45 var(--font-sans);
+  }
+
+  .lineItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6em;
+    animation: lineIn var(--dur-3) var(--ease-out) both;
+  }
+
+  .lineItem > :first-child {
+    margin-block-start: 0.42em;
+    color: var(--text-3);
+  }
+
+  .lineItem > span {
+    white-space: pre-line;
+  }
+
+  .lineItem[data-tone="loss"] > :first-child {
+    color: var(--alarm);
+  }
+
+  .lineItem[data-tone="ok"] > :first-child {
+    color: var(--status-ok);
+  }
+
+  .lineItem[data-tone="work"] > :first-child {
+    color: var(--status-warn);
+  }
+
+  .lineItem[data-tone="idle"] {
+    color: var(--text-3);
+  }
+
+  @keyframes lineIn {
+    from {
+      opacity: 0;
+      translate: 0 0.35em;
+    }
+  }
+
+  /* The lever under each lane. */
+  .deck {
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    gap: 0.1rem;
+    min-inline-size: 0;
+  }
+
+  .fact {
+    margin: 0.2rem 0 0;
+    color: var(--text-3);
+    font: 400 0.8125rem / 1.4 var(--font-sans);
+  }
+
+  /* ---- hexagons --------------------------------------------------------------------------------- */
+
+  .hex {
+    flex: none;
+    inline-size: 20px;
+    block-size: 23.3px;
+    overflow: visible;
+  }
+
+  .hex path {
+    fill: none;
+    stroke: var(--line-3);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  .hex[data-state="up"] path {
+    fill: var(--accent);
+    stroke: var(--text-1);
+  }
+
+  .hex[data-state="failing"] path {
+    fill: var(--alarm);
+    stroke: var(--text-1);
+    animation: flick 0.5s steps(1, end) infinite alternate;
+  }
+
+  .hex[data-state="rebuilding"] path {
+    fill: rgb(var(--status-warn-rgb) / 0.14);
+    stroke: var(--status-warn);
+    stroke-dasharray: 3.2 3;
+    animation: march 1.6s linear infinite;
+  }
+
+  .hex[data-state="lost"] path {
+    fill: rgb(var(--status-crit-rgb) / 0.2);
+    stroke: var(--alarm);
+  }
+
+  @keyframes flick {
+    50% {
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes march {
+    to {
+      stroke-dashoffset: -12.4;
+    }
+  }
+
+  .hexes {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-block-size: 44px;
+  }
+
+  .picker {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.9rem;
+    max-inline-size: 100%;
+  }
+
+  .pickerRow {
+    display: flex;
+    border-radius: var(--r-sm);
+  }
+
+  .pickerRow:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+
+  .pickerCell {
+    display: grid;
+    place-items: center;
+    inline-size: 26px;
+    block-size: 44px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pickerCell .hex {
+    transition: scale var(--dur-2) var(--ease-snap);
+  }
+
+  .pickerCell:hover .hex {
+    scale: 1.14;
+  }
+
+  .pickerCell[data-preview] .hex path {
+    fill: rgb(var(--accent-rgb) / 0.22);
+    stroke: var(--accent-text);
+  }
+
+  .pickerCell[data-fading] .hex {
+    opacity: 0.4;
+  }
+
+  .pickerValue {
+    color: var(--text-2);
+    font: 500 0.875rem / 1 var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* A narrow lane: the count drops under the row, and the twelve hexagons become two rows of six. */
+  @container lane (max-width: 24.5rem) {
+    .picker {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pickerRow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      max-inline-size: 18rem;
+    }
+
+    .pickerCell {
+      inline-size: auto;
+    }
+
+    .pickerValue {
+      padding-block-end: 0.3rem;
+    }
+  }
+
+  /* A wide lane has the room: bigger hexagons to press. */
+  @container lane (min-width: 34rem) {
+    .pickerCell {
+      inline-size: 32px;
+    }
+
+    .pickerCell .hex {
+      inline-size: 23px;
+      block-size: 26.8px;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .pickerCell {
+      inline-size: 44px;
+    }
+  }
+
+  @container lane (max-width: 24.5rem) {
+    @media (pointer: coarse) {
+      .pickerCell {
+        inline-size: auto;
+      }
+    }
+  }
+
+  /* ---- a switch made of words and a hexagon --------------------------------------------------- */
+
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    min-block-size: 44px;
+    color: var(--text-3);
+    font: 500 0.875rem / 1.2 var(--font-sans);
+    text-align: start;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .toggle:hover,
+  .toggle[aria-checked="true"] {
+    color: var(--text-1);
+  }
+
+  .toggle:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+
+  .toggleHex {
+    inline-size: 13px;
+    block-size: 15.2px;
+  }
+
+  /* ---- the way out --------------------------------------------------------------------------- */
+
+  .after {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem 1.5rem;
+  }
+
+  .more {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem 1.5rem;
+    inline-size: 100%;
+  }
+
+  .share {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 1.6rem;
+    min-block-size: 44px;
+  }
+
+  .textButton[data-lit] {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  .receiptsTrigger {
+    min-block-size: 44px;
+    margin-inline-start: auto;
+    color: var(--text-3);
+    font: 400 0.8125rem / 1 var(--font-sans);
+    text-decoration: underline;
+    text-decoration-color: var(--line-3);
+    text-underline-offset: 0.3em;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .receiptsTrigger:hover,
+  .receiptsTrigger[aria-expanded="true"] {
+    color: var(--text-1);
+    text-decoration-color: currentColor;
+  }
+
+  .receiptsTrigger:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 3px;
+  }
+
+  .receipts {
+    inline-size: min(28rem, calc(100vw - 32px));
+    max-inline-size: none;
+    max-block-size: min(76vh, 36rem);
+    padding: 1.1rem 1.25rem 1.2rem;
+  }
+
+  .receiptsList {
+    display: grid;
+    gap: 0.7rem;
+    margin: 0 0 1.1rem;
+    padding: 0;
+    list-style: none;
+    color: var(--text-2);
+    font: 400 var(--fs-sm) / 1.5 var(--font-sans);
+  }
+
+  .receiptsList li {
+    position: relative;
+    padding-inline-start: 1.1rem;
+  }
+
+  .receiptsList li::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0.5em;
+    inset-inline-start: 0;
+    inline-size: 6px;
+    block-size: 6.9px;
+    background: var(--accent-text);
+    clip-path: var(--hex-clip);
+  }
+
+  .receiptsTitle {
+    margin: 0 0 0.55rem;
+    color: var(--text-3);
+    font: 600 0.8125rem / 1.2 var(--font-display);
+  }
+
+  .receiptsSources {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-sm);
+  }
+
+  .receiptsSources a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--accent-rgb) / 0.4);
+    text-underline-offset: 0.2em;
+    overflow-wrap: anywhere;
+  }
+
+  .receiptsSources a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .receiptsDate {
+    display: block;
+    color: var(--text-3);
+    font-size: var(--fs-xs);
+  }
+
+  /* ---- the phone strip: both verdicts, always in sight ---------------------------------------- */
+
+  .strip {
+    position: sticky;
+    inset-block-start: var(--nav-h-condensed);
+    z-index: var(--z-raised);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    background: var(--ink-0);
+    border-block-end: 1px solid var(--line-1);
+  }
+
+  .stripCell {
+    --s: var(--status-ok);
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 0.2rem;
+    min-block-size: 48px;
+    padding: 0.25rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .stripCell[data-status="failing"] {
+    --s: var(--status-warn);
+  }
+
+  .stripCell[data-status="down"] {
+    --s: var(--alarm);
+  }
+
+  .stripCell:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -3px;
+  }
+
+  .stripName {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-1);
+    font: 600 0.8125rem / 1 var(--font-display);
+  }
+
+  .stripName > :first-child {
+    color: var(--s);
+  }
+
+  .stripWord {
+    color: var(--s);
+    font: 500 0.75rem / 1 var(--font-sans);
+    white-space: nowrap;
+  }
+
+  /* ---- tablets and phones ---------------------------------------------------------------------- */
+
+  @media (max-width: 899.98px) {
+    .field {
+      block-size: clamp(13.5rem, 64cqi, 21rem);
+    }
+  }
+
+  @media (max-width: 719.98px) {
+    .skeleton {
+      min-block-size: 120rem;
+    }
+
+    .lanes {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 2.75rem;
+    }
+
+    .lane {
+      scroll-margin-block-start: calc(var(--nav-h-condensed) + 60px);
+    }
+
+    .share {
+      flex-basis: 100%;
+    }
+
+    .receiptsTrigger {
+      margin-inline-start: 0;
+    }
+
+    /* The words pin to the bottom of the screen while the stage is in view. */
+    .rail[data-pinned] {
+      position: fixed;
+      inset-inline: 0;
+      inset-block-end: 0;
+      z-index: var(--z-rail);
+      padding: 0.35rem var(--gutter) calc(0.35rem + var(--safe-bottom));
+      border-block-start: 1px solid var(--line-2);
+      background: var(--ink-0);
+      translate: 0 110%;
+      visibility: hidden;
+      transition:
+        translate var(--dur-3) var(--ease-out),
+        visibility 0s linear var(--dur-3);
+    }
+
+    .rail[data-pinned][data-visible] {
+      translate: 0 0;
+      visibility: visible;
+      transition:
+        translate var(--dur-3) var(--ease-out),
+        visibility 0s;
+    }
+
+    .rail[data-pinned] .railRow {
+      flex-wrap: nowrap;
+      gap: 0.5rem;
+    }
+
+    .rail[data-pinned] .weapons {
+      flex: 1 1 auto;
+      justify-content: space-between;
+      gap: 0;
+    }
+
+    .rail[data-pinned] .lead {
+      display: none;
+    }
+
+    .rail[data-pinned] .weapon {
+      padding: 0 0.3rem;
+      font-size: 0.8125rem;
+      letter-spacing: 0;
+    }
+
+    .rail[data-pinned] .weapon::after {
+      inset-block-end: 0.5rem;
+    }
+
+    .rail[data-pinned] .fireFace {
+      min-block-size: 44px;
+      padding: 0 0.85rem;
+    }
+  }
+
+  /* The smallest phones: the four words and the fire button still share one pinned row. */
+  @media (max-width: 359.98px) {
+    .rail[data-pinned] .weapon {
+      padding: 0 0.15rem;
+      font-size: 0.6875rem;
+    }
+
+    .rail[data-pinned] .fireFace {
+      padding: 0 0.65rem;
+    }
+  }
+
+  /* ---- reduced motion ---------------------------------------------------------------------------- */
+
+  :global(html[data-motion="reduced"]) .score[data-on] .num,
+  :global(html[data-motion="reduced"]) .lineItem,
+  :global(html[data-motion="reduced"]) .weapon[data-fired],
+  :global(html[data-motion="reduced"]) .view[data-down] .canvas,
+  :global(html[data-motion="reduced"]) .hex path {
+    animation: none;
+  }
+
+  :global(html[data-motion="reduced"]) .rail,
+  :global(html[data-motion="reduced"]) .canvas,
+  :global(html[data-motion="reduced"]) .weapon::after,
+  :global(html[data-motion="reduced"]) .pickerCell .hex {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .score[data-on] .num,
+    :global(html:not([data-motion="full"])) .lineItem,
+    :global(html:not([data-motion="full"])) .weapon[data-fired],
+    :global(html:not([data-motion="full"])) .view[data-down] .canvas,
+    :global(html:not([data-motion="full"])) .hex path {
+      animation: none;
+    }
+
+    :global(html:not([data-motion="full"])) .rail,
+    :global(html:not([data-motion="full"])) .canvas,
+    :global(html:not([data-motion="full"])) .weapon::after,
+    :global(html:not([data-motion="full"])) .pickerCell .hex {
+      transition: none;
+    }
+  }
+}

@@ -1,0 +1,118 @@
+/*
+ * The operator's seat. One column on phones and tablets: the header, the stage, then the attempts. From
+ * 1000 px it is two columns: the header and the attempts on the left, the stage standing alone on the
+ * right. Everything is set directly on the page: no panel, no frame. Solid colour and hairlines only.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .seat {
+    display: grid;
+    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "head"
+      "app"
+      "list";
+  }
+
+  .head {
+    grid-area: head;
+    min-inline-size: 0;
+  }
+
+  .app {
+    grid-area: app;
+    display: grid;
+    align-content: start;
+    inline-size: 100%;
+    max-inline-size: 40rem;
+    margin-inline: auto;
+    min-inline-size: 0;
+  }
+
+  .stage {
+    inline-size: 100%;
+    padding-block-start: clamp(0.5rem, 2vw, 1.25rem);
+  }
+
+  .list {
+    grid-area: list;
+    inline-size: 100%;
+    max-inline-size: 40rem;
+    margin-inline: auto;
+    min-inline-size: 0;
+  }
+
+  .listHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-end: 0.7rem;
+  }
+
+  .ask {
+    margin: 0;
+    color: var(--text-1);
+    font: 600 var(--fs-h4) / 1.2 var(--font-display);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  /* Phones: the layer that decided it, set under the selected row. */
+  .inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    max-inline-size: none;
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.4 var(--font-sans);
+  }
+
+  @media (min-width: 720px) {
+    .app,
+    .list {
+      max-inline-size: 44rem;
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .seat {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas:
+        "head app"
+        "list app";
+      column-gap: var(--col-gap, 4rem);
+      row-gap: 0;
+      align-items: start;
+    }
+
+    .app {
+      /* The stage stays in view while the visitor works down the list beside it. */
+      position: sticky;
+      inset-block-start: calc(var(--header-offset) + 0.5rem);
+      align-self: start;
+      max-inline-size: none;
+      margin-inline: 0;
+      /* Fit the stage to the window: a short laptop screen gets a smaller picture, not a cut-off one. */
+      --fit: calc((100svh - var(--header-offset) - 19rem) * 1.26);
+    }
+
+    .stage {
+      max-inline-size: max(24rem, min(100%, 46rem, var(--fit)));
+      margin-inline: auto;
+    }
+
+    .list {
+      max-inline-size: none;
+      margin-inline: 0;
+    }
+
+    .listHead {
+      padding-block-start: 0.5rem;
+    }
+  }
+}

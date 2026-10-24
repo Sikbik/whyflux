@@ -1,0 +1,44 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .pulse {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: 50%;
+    background: var(--status-ok);
+  }
+
+  .pulse::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--status-ok);
+    border-radius: 50%;
+    opacity: 0;
+    animation: pulse-ping 2.4s var(--ease-out) infinite;
+  }
+
+  @keyframes pulse-ping {
+    from {
+      opacity: 0.9;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 3;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .pulse::after {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .pulse::after {
+      animation: none;
+    }
+  }
+}

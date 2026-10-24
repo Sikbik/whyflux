@@ -1,0 +1,247 @@
+/*
+ * The radar: a web of five rings, a polygon per series (Flux filled flat at 18 percent, the rest
+ * strokes, web2 dashed) and a plain-type readout beside it. Solid colour and hairlines only.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .wrap {
+    container: radar / inline-size;
+    min-inline-size: 0;
+  }
+
+  .radar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 1.5rem clamp(1.5rem, 1rem + 2vw, 3rem);
+    min-inline-size: 0;
+  }
+
+  @container radar (min-width: 56rem) {
+    .radar {
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 21rem);
+    }
+  }
+
+  .chart {
+    min-inline-size: 0;
+    outline-offset: 4px;
+  }
+
+  .chart:focus-visible {
+    outline: 2px solid var(--focus-color);
+  }
+
+  .svg {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    max-block-size: 80svh;
+    cursor: crosshair;
+    touch-action: pan-y;
+    overflow: visible;
+  }
+
+  /* ---- web, spokes ------------------------------------------------------------------------------ */
+
+  .ring {
+    fill: none;
+    stroke: var(--line-1);
+    stroke-width: 1;
+  }
+
+  .ring[data-outer] {
+    stroke: var(--line-3);
+  }
+
+  .spoke {
+    stroke: var(--line-2);
+    stroke-width: 1;
+    transition: stroke var(--dur-1) var(--ease-out);
+  }
+
+  .spoke[data-active] {
+    stroke: var(--accent-strong);
+    stroke-width: 1.5;
+  }
+
+  /* ---- series -------------------------------------------------------------------------------------- */
+
+  .shape {
+    stroke-width: 2;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+
+  .shape[data-flux] {
+    stroke-width: 2.75;
+  }
+
+  .marker {
+    pointer-events: none;
+  }
+
+  .tag {
+    animation: tag-in 420ms var(--ease-out) both;
+    animation-delay: calc(520ms + var(--i, 0) * 90ms);
+  }
+
+  @keyframes tag-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  .tagText {
+    fill: var(--text-1);
+    font: 600 12.5px var(--font-display);
+    paint-order: stroke;
+    stroke: var(--ink-0);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+
+  .dimLabel {
+    fill: var(--text-3);
+    font: 500 12.5px var(--font-display);
+    pointer-events: none;
+    transition: fill var(--dur-1) var(--ease-out);
+  }
+
+  .dimLabel[data-active] {
+    fill: var(--text-1);
+  }
+
+  /* ---- the readout: plain type, no surface ------------------------------------------------------------ */
+
+  .readout {
+    display: grid;
+    gap: 0.75rem;
+    min-inline-size: 0;
+  }
+
+  @container radar (min-width: 56rem) {
+    .readout {
+      position: sticky;
+      inset-block-start: calc(var(--nav-h, 60px) + 1.5rem);
+      padding-block-start: 1rem;
+    }
+  }
+
+  .rHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .rGroup {
+    max-inline-size: none;
+    margin: 0;
+    color: var(--accent-text);
+    font: 500 var(--fs-sm) / 1.2 var(--font-display);
+  }
+
+  .rStep {
+    display: flex;
+    gap: 0.25rem;
+    margin-inline-end: -0.4rem;
+  }
+
+  .rTitle {
+    color: var(--text-1);
+    font: 600 var(--fs-h3) / 1.15 var(--font-display);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  .rAsk {
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+  }
+
+  .rows {
+    display: grid;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .rRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.3rem 0.75rem;
+    align-items: center;
+    inline-size: 100%;
+    padding: 0.7rem 0.5rem;
+    border-block-end: 1px solid var(--line-1);
+    text-align: start;
+    cursor: pointer;
+    transition: background var(--dur-2) var(--ease-out);
+  }
+
+  .rRow:hover:not(:disabled) {
+    background: rgb(var(--accent-rgb) / 0.07);
+  }
+
+  .rRow:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
+
+  .rName {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-1);
+    font: 600 var(--fs-sm) / 1.2 var(--font-display);
+  }
+
+  .rScore {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .rScore b {
+    min-inline-size: 1.2ch;
+    color: var(--text-1);
+    font: 300 1.375rem / 1 var(--font-display);
+    letter-spacing: -0.02em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rShort {
+    grid-column: 1 / -1;
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+  }
+
+  .rHint {
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-3);
+    font-size: var(--fs-xs);
+  }
+
+  :global(html[data-motion="reduced"]) .tag {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .tag {
+      animation: none;
+    }
+  }
+}

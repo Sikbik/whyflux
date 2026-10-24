@@ -1,0 +1,140 @@
+/*
+ * The proof wall: numbers on the page, no boxes. A 30-column grid so three loud numbers (10 columns
+ * each) and five quiet ones (6 each) share one rhythm; each cell is ruled once along its top.
+ * Numbers are weight 300, tabular, and never wider than their cell.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .wall {
+    margin-block-start: clamp(0.5rem, 0rem + 1vw, 1.5rem);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(30, minmax(0, 1fr));
+    column-gap: clamp(1rem, 0.5rem + 1.6vw, 2rem);
+    row-gap: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    margin: 0;
+  }
+
+  .stat {
+    display: grid;
+    align-content: start;
+    gap: 0.45rem;
+    min-inline-size: 0;
+    padding-block-start: clamp(1rem, 0.8rem + 0.8vw, 1.5rem);
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .stat[data-size="big"] {
+    grid-column: span 10;
+  }
+
+  .stat[data-size="small"] {
+    grid-column: span 6;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0;
+    color: var(--text-2);
+    font: 500 var(--fs-md) / 1.25 var(--font-sans);
+  }
+
+  .value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.16em;
+    margin: 0;
+    color: var(--text-1);
+    font-family: var(--font-display);
+    font-weight: var(--fw-light);
+    font-variant-numeric: tabular-nums;
+    line-height: 0.95;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+  }
+
+  .stat[data-size="big"] .value {
+    margin-block: 0.15em 0.05em;
+    font-size: clamp(3.5rem, 0.4rem + 8.6vw, 8.5rem);
+  }
+
+  .stat[data-size="small"] .value {
+    margin-block: 0.1em 0;
+    font-size: clamp(2.1rem, 0.6rem + 3vw, 3.5rem);
+  }
+
+  .unit {
+    color: var(--text-3);
+    font: 500 0.34em / 1 var(--font-display);
+    letter-spacing: 0.02em;
+  }
+
+  .caption {
+    margin: 0;
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+  }
+
+  .note {
+    max-inline-size: 72ch;
+    margin: clamp(1.75rem, 1.2rem + 2vw, 3rem) 0 0;
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+    line-height: 1.7;
+  }
+
+  .dot {
+    color: var(--text-4);
+  }
+
+  @media (max-width: 1099.98px) {
+    .stat[data-size="small"] {
+      grid-column: span 10;
+    }
+  }
+
+  /* Phones: thirty columns cannot fit (their gaps alone are wider than the screen), so the grid becomes two:
+     the first number takes the whole line, everything else sits two to a row. */
+  @media (max-width: 719.98px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 1.25rem;
+    }
+
+    .stat[data-size="big"],
+    .stat[data-size="small"] {
+      grid-column: span 1;
+    }
+
+    .stat[data-size="big"]:first-child,
+    .stat:last-child:nth-child(even) {
+      grid-column: 1 / -1;
+    }
+
+    .stat[data-size="big"]:first-child .value {
+      font-size: clamp(4.5rem, 3rem + 11vw, 6rem);
+    }
+
+    .stat[data-size="big"] .value {
+      font-size: clamp(2.75rem, 1.6rem + 6.4vw, 3.75rem);
+    }
+
+    .stat[data-size="small"] .value {
+      font-size: clamp(2rem, 1.2rem + 4.6vw, 2.75rem);
+    }
+
+    .label {
+      font-size: var(--fs-sm);
+    }
+
+    .caption {
+      font-size: var(--fs-xs);
+    }
+  }
+}

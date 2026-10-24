@@ -1,0 +1,280 @@
+/*
+ * Part two of chapter 03: the pinned story. The shell is the ScrollStage's sticky stage. Ten ticks down the
+ * left edge, the door switcher in the top corner, the picture across the middle and a big title with one
+ * line under it along the bottom. No boxes, no capsules, no counters. Solid colour, hairlines and type.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  /*
+   * ScrollStage writes --p and --pc on its wrapper every scroll frame, and custom properties inherit: left
+   * alone, that restyles every element of the picture each frame although nothing here reads them. Pinning
+   * them to a constant here stops it; the stage has its own clock (clock.ts).
+   */
+  .stageShell {
+    --p: 0;
+    --pc: 0;
+    background: var(--void);
+  }
+
+  .stage {
+    --t: 0;
+    position: relative;
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    gap: clamp(0.5rem, 0.2rem + 1vw, 1.5rem);
+    block-size: 100%;
+    min-inline-size: 0;
+    padding-block: 0.85rem 0.5rem;
+  }
+
+  /* ---- the ticks --------------------------------------------------------------------------------- */
+
+  .rail {
+    display: grid;
+    align-content: center;
+    min-block-size: 0;
+  }
+
+  /* The line runs from the first step to the last, so what it has filled is how far along the story is. */
+  .railBody {
+    position: relative;
+  }
+
+  .rail ol {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .railLine {
+    position: absolute;
+    inset-block: 14px;
+    inset-inline-start: 0;
+    inline-size: 1px;
+    background: var(--line-2);
+  }
+
+  .railLine i {
+    position: absolute;
+    inset: 0;
+    background: var(--text-1);
+    transform-origin: top;
+    scale: 1 clamp(0, calc(var(--t) / 9), 1);
+  }
+
+  .tick {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    block-size: 28px;
+    cursor: pointer;
+  }
+
+  .tick::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 50%;
+    inline-size: 9px;
+    block-size: 1px;
+    background: var(--line-3);
+    transition:
+      inline-size var(--dur-2) var(--ease-out),
+      background var(--dur-2) var(--ease-out);
+  }
+
+  .tick[data-done]::before {
+    background: var(--text-2);
+  }
+
+  .tick[aria-current="step"]::before {
+    inline-size: 22px;
+    block-size: 2px;
+    margin-block-start: -0.5px;
+    background: var(--text-1);
+  }
+
+  .tick:hover::before {
+    inline-size: 15px;
+    background: var(--text-1);
+  }
+
+  /* The step's name, on hover or focus, in plain type beside its tick. */
+  .tick::after {
+    content: attr(data-title);
+    position: absolute;
+    z-index: 2;
+    inset-inline-start: 32px;
+    inset-block-start: 50%;
+    translate: 0 -50%;
+    padding-inline: 0.5rem;
+    background: var(--void);
+    color: var(--text-1);
+    font: 500 var(--fs-sm) / 1.6 var(--font-display);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-2) var(--ease-out);
+  }
+
+  .tick:is(:hover, :focus-visible)::after {
+    opacity: 1;
+  }
+
+  .tick:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+
+  /* ---- the main column ------------------------------------------------------------------------------ */
+
+  .main {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 0.4rem;
+    min-block-size: 0;
+    min-inline-size: 0;
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    min-block-size: 2.25rem;
+  }
+
+  .sceneWrap {
+    container-type: size;
+    display: grid;
+    place-items: center;
+    min-block-size: 0;
+  }
+
+  .sceneBox {
+    position: relative;
+    inline-size: min(100cqw, calc(100cqh * 1.875));
+    aspect-ratio: 1200 / 640;
+  }
+
+  /* ---- the caption: a big title, one line, and the receipts ----------------------------------------------- */
+
+  .caption {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 1.5rem;
+    block-size: 8.5rem;
+    padding-block-start: 0.5rem;
+  }
+
+  .capBody {
+    display: grid;
+    gap: 0.7rem;
+    min-inline-size: 0;
+    animation: cap-in var(--dur-3) var(--ease-out) both;
+  }
+
+  @keyframes cap-in {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+
+  .capTitle {
+    margin: 0;
+    color: var(--text-1);
+    font: 300 clamp(2rem, 1.2rem + 2.7vw, 3.75rem) / 1.02 var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .capTitle b {
+    font-weight: 700;
+  }
+
+  .capLine {
+    margin: 0;
+    max-inline-size: 52rem;
+    color: var(--text-2);
+    font: 400 var(--fs-lead) / 1.4 var(--font-sans);
+    text-wrap: balance;
+  }
+
+  .capFoot {
+    align-self: end;
+    padding-block-end: 0.2rem;
+  }
+
+  :global(html[data-motion="reduced"]) .capBody {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .capBody {
+      animation: none;
+    }
+  }
+
+  /* ---- below the desktop width: a plain run of steps ------------------------------------------------------ */
+
+  .steps {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .sticky {
+    position: sticky;
+    inset-block-start: calc(var(--nav-h) + 6px);
+    z-index: var(--z-raised);
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 0.35rem var(--gutter);
+    background: var(--void);
+    border-block-end: 1px solid var(--line-1);
+  }
+
+  /* One column on a phone, two once a step can be wide enough to read. */
+  .stepList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+    gap: 3.5rem var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stepItem,
+  .step {
+    display: grid;
+    min-inline-size: 0;
+  }
+
+  .step {
+    align-content: start;
+    gap: 0.85rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .step .capTitle {
+    font-size: clamp(1.875rem, 1.3rem + 1.8vw, 2.75rem);
+  }
+
+  .step .capLine {
+    font-size: var(--fs-md);
+    max-inline-size: 30rem;
+  }
+
+  /* A step's picture sits straight on the page: no frame. */
+  .mini {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 34rem;
+    margin-block: 0.6rem 0.2rem;
+  }
+
+  .stepFoot {
+    justify-self: start;
+  }
+}

@@ -1,0 +1,174 @@
+/*
+ * The arena's two small marks.
+ *   glyph  one matrix cell: a hexagon filled from the bottom to the score, outlined by the verdict
+ *          (solid yes, dashed partial, dotted no). Flat colour only; the level is a clip, not a gradient.
+ *   pips   five small hexagons lit to a score (the versus rows).
+ * Colours come from --gl-fill and --gl-rim, set by whatever holds the mark.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .glyph {
+    display: block;
+    flex: none;
+    overflow: visible;
+  }
+
+  .well {
+    fill: rgb(var(--ink-1-rgb));
+    stroke: none;
+  }
+
+  .fill {
+    fill: var(--gl-fill, var(--accent));
+    stroke: none;
+    clip-path: inset(calc((1 - var(--lvl, 0)) * 100%) 0 0 0);
+    transition: clip-path 640ms var(--ease-out), fill var(--dur-2) var(--ease-out);
+  }
+
+  /* Revealed on a diagonal: the matrix sets --r and --c on each cell and data-shown on the grid. */
+  .glyph[data-anim] .fill {
+    clip-path: inset(100% 0 0 0);
+    transition-delay: calc(min(600, (var(--r, 0) + var(--c, 0)) * 10) * 1ms + 180ms);
+  }
+
+  :global([data-shown="true"]) .glyph[data-anim] .fill {
+    clip-path: inset(calc((1 - var(--lvl, 0)) * 100%) 0 0 0);
+  }
+
+  .rim {
+    fill: none;
+    stroke: var(--gl-rim, var(--text-3));
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    transition: stroke var(--dur-2) var(--ease-out);
+  }
+
+  .glyph[data-verdict="yes"] .rim {
+    stroke: var(--gl-rim, var(--accent-strong));
+  }
+
+  .glyph[data-verdict="partial"] .rim {
+    stroke-dasharray: 7 3;
+  }
+
+  .glyph[data-verdict="no"] .rim {
+    stroke: var(--gl-rim, var(--text-4));
+    stroke-dasharray: 0.01 5;
+    stroke-linecap: round;
+    stroke-width: 2;
+  }
+
+  .glyph[data-verdict="na"] .rim {
+    stroke: var(--gl-rim, var(--text-4));
+    stroke-dasharray: 0.01 5;
+    stroke-linecap: round;
+    stroke-width: 1.5;
+    opacity: 0.6;
+  }
+
+  /* A ring drawn around a glyph: the "Flux loses here" mark and the open-receipt mark. */
+  .ringSvg {
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-start: 50%;
+    display: block;
+    translate: -50% -50%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .ringSvg path {
+    fill: none;
+    stroke: var(--ring, var(--alarm));
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  .dash {
+    fill: none;
+    stroke: var(--text-3);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  /* ---- pips ----------------------------------------------------------------------------------- */
+
+  .pips {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .pip {
+    display: block;
+    overflow: visible;
+    flex: none;
+  }
+
+  .pip path {
+    fill: none;
+    stroke: var(--line-3);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    transition: fill var(--dur-2) var(--ease-out), stroke var(--dur-2) var(--ease-out);
+  }
+
+  .pip[data-on] path {
+    fill: var(--gl-fill, var(--accent));
+    stroke: var(--gl-fill, var(--accent));
+  }
+
+  /* The bars grow outward from the middle of the matchup: nearest pip first, once an ancestor says shown. */
+  .pips[data-anim] .pip[data-on] {
+    opacity: 0;
+  }
+
+  :global([data-shown="true"]) .pips[data-anim] .pip[data-on] {
+    animation: pip-in 520ms var(--ease-snap) both;
+    animation-delay: calc(var(--row-delay, 0ms) + var(--k) * 70ms);
+  }
+
+  /* Explicit end frame: the resting style of a lit pip is hidden until the reveal, so `to` must say visible. */
+  @keyframes pip-in {
+    from {
+      opacity: 0;
+      scale: 0.2;
+    }
+
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .fill,
+  :global(html[data-motion="reduced"]) .rim {
+    transition: none;
+  }
+
+  :global(html[data-motion="reduced"]) .glyph[data-anim] .fill {
+    clip-path: inset(calc((1 - var(--lvl, 0)) * 100%) 0 0 0);
+  }
+
+  :global(html[data-motion="reduced"]) .pips[data-anim] .pip[data-on] {
+    opacity: 1;
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .fill,
+    :global(html:not([data-motion="full"])) .rim {
+      transition: none;
+    }
+
+    :global(html:not([data-motion="full"])) .glyph[data-anim] .fill {
+      clip-path: inset(calc((1 - var(--lvl, 0)) * 100%) 0 0 0);
+    }
+
+    :global(html:not([data-motion="full"])) .pips[data-anim] .pip[data-on] {
+      opacity: 1;
+      animation: none;
+    }
+  }
+}

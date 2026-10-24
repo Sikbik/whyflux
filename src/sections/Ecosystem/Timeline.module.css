@@ -1,0 +1,273 @@
+/*
+ * The milestones: one strip on one axis. Nothing is boxed; a date and a title hang under each hexagon,
+ * and the strip runs the full width of the screen (the first entry lines up with the page's left
+ * edge, the last with its right edge, everything between is cropped by the screen itself, so no
+ * fade is needed). The sentence and the sources open in a popover.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .wrap {
+    --card: clamp(11.5rem, 15.5vw, 15rem);
+    --gap: clamp(1.25rem, 2vw, 2.25rem);
+    /* The distance from the screen edge to the page's content edge, so the strip lines up with the text above it. */
+    --edge: max(var(--gutter), calc((100vw - var(--container)) / 2));
+    --axis: 3.5rem;
+    position: relative;
+    margin-block-start: clamp(5rem, 3rem + 7vw, 9rem);
+  }
+
+  .nav {
+    position: absolute;
+    inset-block-start: -2.75rem;
+    inset-inline-end: 0;
+    z-index: 2;
+    display: inline-flex;
+    gap: 0.25rem;
+  }
+
+  /* ---- the scrolling region ------------------------------------------------------------------- */
+
+  .region {
+    margin-inline: calc(50% - 50vw);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+
+  .region::-webkit-scrollbar {
+    display: none;
+  }
+
+  .region:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .region[data-dragging="true"] {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
+  }
+
+  .track {
+    display: flex;
+    gap: var(--gap);
+    inline-size: max-content;
+    margin: 0;
+    padding: 0 var(--edge);
+    list-style: none;
+  }
+
+  .item {
+    position: relative;
+    flex: none;
+    inline-size: var(--card);
+    padding-block: calc(var(--axis) + 1.25rem) 0.5rem;
+    scroll-snap-align: start;
+    scroll-margin-inline-start: var(--edge);
+  }
+
+  /* The axis: a hairline from one hexagon to the next, dashed on the way to what has not happened yet. */
+  .item::before {
+    content: "";
+    position: absolute;
+    inset-block-start: var(--axis);
+    inset-inline: 0 calc(-1 * var(--gap));
+    block-size: 1px;
+    background: rgb(var(--accent-rgb) / 0.42);
+  }
+
+  .item:last-child::before {
+    display: none;
+  }
+
+  .item:has(+ .item[data-state="expected"])::before {
+    background: none;
+    border-block-start: 1px dashed rgb(var(--accent-rgb) / 0.6);
+  }
+
+  .tick {
+    position: absolute;
+    inset-block-start: calc(var(--axis) - 7px);
+    inset-inline-start: 0;
+    display: grid;
+    place-items: center;
+    color: var(--accent);
+  }
+
+  .item[data-state="expected"] .tick {
+    color: var(--text-2);
+  }
+
+  .year {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: -1px;
+    color: var(--text-2);
+    font: 300 clamp(1.625rem, 1.2rem + 1.2vw, 2.25rem) / 1 var(--font-display);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    user-select: none;
+  }
+
+  /* ---- one entry ------------------------------------------------------------------------------------- */
+
+  .hit {
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    gap: 0.4rem;
+    inline-size: 100%;
+    padding: 0 0 0.25rem;
+    text-align: start;
+  }
+
+  .date {
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1.2 var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  .title {
+    color: var(--text-1);
+    font: 600 clamp(0.9375rem, 0.85rem + 0.3vw, 1.0625rem) / 1.28 var(--font-display);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    text-decoration: underline transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    transition: text-decoration-color var(--dur-1) var(--ease-out);
+  }
+
+  .hit:hover .title,
+  .hit[aria-expanded="true"] .title {
+    text-decoration-color: rgb(var(--accent-rgb) / 0.7);
+  }
+
+  .item[data-state="expected"] .date {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  /* The countdown: a pulsing dot and plain words. */
+  .eta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--accent-strong);
+    font: 500 var(--fs-sm) / 1.2 var(--font-sans);
+  }
+
+  .dot {
+    position: relative;
+    flex: none;
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--accent-strong);
+  }
+
+  .dot::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--accent-strong);
+    border-radius: 50%;
+    opacity: 0;
+    animation: ping 2.4s var(--ease-out) infinite;
+  }
+
+  @keyframes ping {
+    from {
+      opacity: 0.85;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 3.4;
+    }
+  }
+
+  /* ---- the popover (it lives in a portal, outside the strip) ---------------------------------------------- */
+
+  .panel {
+    inline-size: min(22rem, calc(100vw - 16px));
+    padding: 1.05rem 1.15rem 1rem;
+  }
+
+  .pDate {
+    margin: 0 0 0.3rem;
+    color: var(--text-3);
+    font: 500 var(--fs-xs) / 1.2 var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  .pTitle {
+    margin: 0 0 0.55rem;
+    color: var(--text-1);
+    font: 600 1.0625rem / 1.25 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  .pBody {
+    margin: 0 0 0.9rem;
+    color: var(--text-2);
+    font: 400 var(--fs-sm) / 1.55 var(--font-sans);
+  }
+
+  .pSources {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0.8rem 0 0;
+    border-block-start: 1px solid var(--line-1);
+    list-style: none;
+  }
+
+  .pSources a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    color: var(--accent-strong);
+    font: 400 var(--fs-sm) / 1.35 var(--font-sans);
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--accent-rgb) / 0.4);
+    text-underline-offset: 0.2em;
+  }
+
+  .pSources a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* ---- phones: swipe, no arrows ------------------------------------------------------------------------------ */
+
+  @media (max-width: 719.98px) {
+    .wrap {
+      --card: 12.5rem;
+      --gap: 1.25rem;
+    }
+
+    .nav {
+      display: none;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .region {
+    scroll-behavior: auto;
+  }
+
+  :global(html[data-motion="reduced"]) .dot::after {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .dot::after {
+      animation: none;
+    }
+  }
+}

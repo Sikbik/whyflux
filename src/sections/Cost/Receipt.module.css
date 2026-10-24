@@ -1,0 +1,188 @@
+/*
+ * The receipt: one price, itemized, as plain type beside the chart (or under the tapped row on a
+ * phone). A hairline on one side and mono amounts, nothing boxed.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .receipt {
+    min-inline-size: 0;
+  }
+
+  .swap {
+    display: grid;
+    gap: 1.25rem;
+    animation: swap var(--dur-3) var(--ease-out) both;
+  }
+
+  @keyframes swap {
+    from {
+      opacity: 0;
+      translate: 0 5px;
+    }
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .who {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-inline-size: 0;
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-1);
+    font: 600 var(--fs-h4) / 1.2 var(--font-display);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  .total {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1rem;
+    max-inline-size: none;
+    margin: 0;
+  }
+
+  .total b {
+    color: var(--text-1);
+    font: 300 var(--fs-stat) / 1 var(--font-display);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  .total > span {
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+  }
+
+  .times {
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+  }
+
+  .times b {
+    color: var(--accent-strong);
+    font: 600 1.25rem / 1 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  .lead {
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-2);
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+  }
+
+  .block {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .h {
+    margin: 0;
+    color: var(--text-1);
+    font: 600 var(--fs-sm) / 1.2 var(--font-display);
+  }
+
+  .items {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .items li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.6rem;
+    border-block-end: 1px solid var(--line-1);
+    color: var(--text-2);
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+
+  .items li b {
+    flex: none;
+    color: var(--text-1);
+    font: 500 var(--fs-sm) / 1.4 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sum {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-1);
+    font: 600 var(--fs-md) / 1 var(--font-display);
+  }
+
+  .sum b {
+    color: var(--text-1);
+    font: 600 var(--fs-md) / 1 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .notes {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .notes li {
+    position: relative;
+    padding-inline-start: 1.1rem;
+    color: var(--text-2);
+    font-size: var(--fs-sm);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  .notes li::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0.55em;
+    inset-inline-start: 0;
+    inline-size: 6px;
+    block-size: 7px;
+    background: var(--steel-700);
+    clip-path: var(--hex-clip);
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding-block-start: 0.9rem;
+    border-block-start: 1px solid var(--line-1);
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+  }
+
+  :global(html[data-motion="reduced"]) .swap {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .swap {
+      animation: none;
+    }
+  }
+}

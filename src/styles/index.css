@@ -1,0 +1,14 @@
+/*
+ * The one global stylesheet. Imported once from main.tsx, before any component:
+ *
+ *   import '@/styles/index.css';
+ *
+ * Layer order (lowest to highest): reset, tokens, base, ui (the kit), section (the page),
+ * utility. Kit CSS Modules wrap their rules in `@layer ui`; section modules in `@layer section`.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@import "./tokens.css";
+@import "./fonts.css";
+@import "./base.css";
+@import "./utilities.css";

@@ -1,0 +1,320 @@
+/*
+ * Chapter 00: the hero. Layers, bottom to top:
+ *   poster   the generated horizon plate: the first paint, and the whole picture without WebGL
+ *   stage    the live globe canvas (and its hover reticle)
+ *   copy     headline, lead, actions
+ *   window   the empty row the planet shows through (and, on phones, the anchor for its top edge)
+ *   strip    the network's own numbers, on a flat translucent black backing
+ * Solid colour, hairlines and flat tints only: no gradients, no glows, no blobs (house rule).
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .hero {
+    --p: 0;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-block-size: max(100svh, 700px);
+    padding-block-start: calc(var(--nav-h) + clamp(0.25rem, 1vh, 1rem));
+    padding-inline: var(--gutter);
+    overflow: clip;
+    background: var(--void);
+  }
+
+  /* ---- layers -------------------------------------------------------------------------------- */
+
+  .poster {
+    transition: opacity 1.8s var(--ease-out);
+  }
+
+  .hero[data-gl="ready"] .poster {
+    opacity: 0;
+  }
+
+  .stage {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    translate: 0 calc(var(--p) * 7vh * var(--motion-scale));
+  }
+
+  .globeBox {
+    position: absolute;
+    inset: 0;
+  }
+
+  .canvas {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    /* Vertical swipes scroll the page; horizontal drags spin the planet. */
+    touch-action: pan-y;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 1.4s var(--ease-out);
+  }
+
+  .canvas[data-dragging="true"] {
+    cursor: grabbing;
+  }
+
+  .hero[data-gl="ready"] .canvas {
+    opacity: 1;
+  }
+
+  /* ---- copy ------------------------------------------------------------------------------------ */
+
+  .copy {
+    position: relative;
+    z-index: 4;
+    display: grid;
+    justify-items: center;
+    gap: clamp(0.9rem, 0.5rem + 1.6vh, 1.6rem);
+    text-align: center;
+    pointer-events: none;
+    translate: 0 calc(var(--p) * -9vh * var(--motion-scale));
+    opacity: calc(1 - var(--p) * 1.7);
+  }
+
+  .copy a,
+  .copy button {
+    pointer-events: auto;
+  }
+
+  .leadWrap {
+    max-inline-size: 47rem;
+  }
+
+  .lead {
+    margin-inline: auto;
+    max-inline-size: 47rem;
+    text-wrap: balance;
+  }
+
+  .leadShort {
+    display: none;
+  }
+
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1rem;
+    pointer-events: none;
+  }
+
+  /* ---- the window ------------------------------------------------------------------------------------ */
+
+  /* The row between the copy and the strip: nothing in it, the planet shows through. */
+  .window {
+    position: relative;
+    z-index: 4;
+    min-block-size: 3rem;
+    /* The planet's top edge sits at this row's top edge: pulled up so the limb rises behind the actions. */
+    margin-block-start: -2.25rem;
+    pointer-events: none;
+  }
+
+  /* Only shown when the real positions are not available and an illustrative network is drawn. */
+  .note {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-end: 0.75rem;
+    margin: 0;
+    color: var(--text-3);
+    font: 400 var(--fs-xs) / 1.3 var(--font-sans);
+  }
+
+  /* ---- the strip ----------------------------------------------------------------------------------------- */
+
+  /*
+   * The network's own numbers: a full-bleed strip on a flat translucent black backing with one
+   * hairline on top. It replaces the old fade into black, so the numbers read over the planet without
+   * a gradient anywhere.
+   */
+  .barWrap {
+    position: relative;
+    z-index: 4;
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    padding-block: clamp(1.1rem, 2.6vh, 1.6rem) clamp(1.25rem, 3.2vh, 2rem);
+    background: rgb(0 0 0 / 0.8);
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .bar {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    align-items: end;
+    gap: 0 clamp(0.75rem, 2vw, 2rem);
+    inline-size: min(100%, 72rem);
+    margin-inline: auto;
+  }
+
+  .stats {
+    display: contents;
+  }
+
+  /* Number over name: the term comes first in the markup, the value is drawn on top. */
+  .fig {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.4rem;
+    min-inline-size: 0;
+    margin: 0;
+  }
+
+  .figLabel {
+    margin: 0;
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.2 var(--font-sans);
+  }
+
+  .figValue {
+    margin: 0;
+    color: var(--text-1);
+    font: 300 clamp(1.75rem, 0.9rem + 2.2vw, 3rem) / 1 var(--font-display);
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .meta {
+    display: grid;
+    justify-items: end;
+    gap: 0.5rem;
+    padding-block-end: 0.15rem;
+  }
+
+  /* ---- reticle ----------------------------------------------------------------------------------------- */
+
+  .reticle {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 5;
+    inline-size: 0;
+    block-size: 0;
+    pointer-events: none;
+    will-change: translate;
+  }
+
+  .reticleBox {
+    --c: var(--accent-hot-rgb);
+    --k: 9px;
+    position: absolute;
+    inset-block-start: -19px;
+    inset-inline-start: -19px;
+    inline-size: 38px;
+    block-size: 38px;
+    background:
+      linear-gradient(rgb(var(--c)), rgb(var(--c))) left top / var(--k) 1px no-repeat,
+      linear-gradient(rgb(var(--c)), rgb(var(--c))) left top / 1px var(--k) no-repeat,
+      linear-gradient(rgb(var(--c)), rgb(var(--c))) right top / var(--k) 1px no-repeat,
+      linear-gradient(rgb(var(--c)), rgb(var(--c))) right top / 1px var(--k) no-repeat,
+      linear-gradient(rgb(var(--c)), rgb(var(--c))) left bottom / var(--k) 1px no-repeat,
+      linear-gradient(rgb(var(--c)), rgb(var(--c))) left bottom / 1px var(--k) no-repeat,
+      linear-gradient(rgb(var(--c)), rgb(var(--c))) right bottom / var(--k) 1px no-repeat,
+      linear-gradient(rgb(var(--c)), rgb(var(--c))) right bottom / 1px var(--k) no-repeat;
+    animation: reticle-in var(--dur-3) var(--ease-out) both;
+  }
+
+  @keyframes reticle-in {
+    from {
+      scale: 1.6;
+      opacity: 0;
+    }
+  }
+
+  .reticleTag {
+    position: absolute;
+    inset-block-start: -22px;
+    inset-inline-start: 30px;
+    display: grid;
+    gap: 0.15rem;
+    min-inline-size: 11rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid rgb(var(--accent-rgb) / 0.55);
+    background: rgb(var(--ink-0-rgb) / 0.9);
+    -webkit-backdrop-filter: blur(var(--blur-2));
+    backdrop-filter: blur(var(--blur-2));
+    color: var(--text-2);
+    font: 400 var(--fs-xs) / 1.3 var(--font-sans);
+    white-space: nowrap;
+    animation: tag-in var(--dur-3) var(--ease-out) both;
+  }
+
+  @keyframes tag-in {
+    from {
+      opacity: 0;
+      translate: -10px 0;
+    }
+  }
+
+  .reticleTag b {
+    color: var(--text-1);
+    font: 600 var(--fs-sm) / 1.2 var(--font-display);
+  }
+
+  /* ---- phones ---------------------------------------------------------------------------------------------- */
+
+  @media (max-width: 719.98px) {
+    .hero {
+      min-block-size: 0;
+      padding-block-start: calc(var(--nav-h) + 1rem);
+    }
+
+    .leadLong {
+      display: none;
+    }
+
+    .leadShort {
+      display: inline;
+    }
+
+    .ctas {
+      inline-size: 100%;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .ctas > * {
+      inline-size: 100%;
+    }
+
+    /* The planet's own window: its top edge is this row's top edge (HeroGlobe measures it). */
+    .window {
+      min-block-size: clamp(15rem, 40svh, 22rem);
+      margin-block-start: 0;
+    }
+
+    .bar {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem 1rem;
+      padding-block-start: 1rem;
+    }
+
+    .meta {
+      grid-column: 1 / -1;
+      grid-auto-flow: column;
+      justify-content: space-between;
+      justify-items: start;
+      align-items: center;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .reticleBox,
+  :global(html[data-motion="reduced"]) .reticleTag {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .reticleBox,
+    :global(html:not([data-motion="full"])) .reticleTag {
+      animation: none;
+    }
+  }
+}

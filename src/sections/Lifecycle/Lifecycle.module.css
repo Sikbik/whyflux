@@ -1,0 +1,8 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .story {
+    margin-block-start: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+    scroll-margin-block-start: var(--nav-h);
+  }
+}

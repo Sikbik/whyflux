@@ -1,0 +1,28 @@
+/*
+ * An answer: a glyph and one word in the verdict's colour. The kit's data-tone re-points the accent roles
+ * (warn: orange, crit: alarm red), so this only ever reads --accent-text. No capsule, no fill.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .answer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    color: var(--accent-text);
+    font: 600 var(--fs-md) / 1 var(--font-display);
+    letter-spacing: 0.005em;
+    white-space: nowrap;
+  }
+
+  .answer svg {
+    flex: none;
+    inline-size: 0.95em;
+    block-size: 0.95em;
+  }
+
+  .answer[data-size="lg"] {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    font-weight: 500;
+  }
+}

@@ -1,0 +1,122 @@
+/*
+ * The sunrise. One zero-size anchor at the middle of the band; everything hangs off it. The plate is
+ * sized by the stage's width (cqw) and offset by where its own sun sits in the picture (41.3 percent
+ * across, 53.7 percent down), so that sun lands exactly on the anchor at every screen size.
+ *
+ * Scroll writes --lift, --veil and --sun on .horizon (see Dawn.tsx). The stylesheet holds them at the
+ * finished dawn under reduced motion. Our own light is crisp: a solid warm-white disc and two hairline
+ * rings, hard edges only. The plate is the one soft thing here (it is art), and its fade is a mask whose
+ * only job is to leave the area under the type dark.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .horizon {
+    --lift: 0;
+    --veil: 0;
+    --sun: 0;
+    position: relative;
+    z-index: 0;
+    block-size: clamp(11rem, 5rem + 19vw, 22rem);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .anchor {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: 0;
+    block-size: 0;
+    /* The sun climbs: the whole dawn rises a little as it arrives. */
+    translate: 0 calc((1 - var(--lift)) * 5.5rem * var(--motion-scale));
+  }
+
+  .anchor > * {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+  }
+
+  .plate {
+    inline-size: clamp(900px, 128cqw, 2300px);
+    aspect-ratio: 1774 / 998;
+    translate: -41.3% -53.7%;
+    opacity: var(--veil);
+    /* Fade the picture out around its sun, and down to black before the type begins, so no edge of it ever shows. */
+    -webkit-mask-image:
+      radial-gradient(ellipse 58% 54% at 41.3% 53.7%, #000 40%, transparent 100%),
+      linear-gradient(180deg, #000 0, #000 60%, transparent 76%);
+    mask-image:
+      radial-gradient(ellipse 58% 54% at 41.3% 53.7%, #000 40%, transparent 100%),
+      linear-gradient(180deg, #000 0, #000 60%, transparent 76%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  /* The sun: one solid warm-white disc, hard-edged. It rises into place with the scroll. */
+  .sun {
+    inline-size: clamp(2.75rem, 5cqw, 5.25rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgb(var(--dawn-rgb));
+    translate: -50% -50%;
+    scale: calc(0.35 + 0.65 * var(--sun));
+    opacity: var(--sun);
+  }
+
+  /* Two hairline rings around it, opening as it comes up: light as a crisp line. Only their upper halves
+     show, so they rise out of the horizon instead of crossing the planet. */
+  .ring {
+    aspect-ratio: 1;
+    border: 1px solid rgb(var(--dawn-rgb));
+    border-radius: 50%;
+    clip-path: inset(0 0 50% 0);
+    translate: -50% -50%;
+    scale: calc(0.5 + 0.5 * var(--sun));
+  }
+
+  .ring[data-ring="inner"] {
+    inline-size: clamp(5.5rem, 10.5cqw, 11rem);
+    opacity: calc(var(--sun) * 0.55);
+  }
+
+  .ring[data-ring="outer"] {
+    inline-size: clamp(9rem, 17cqw, 18rem);
+    opacity: calc(var(--sun) * 0.24);
+  }
+
+  /* ---- calm: the dawn at rest ------------------------------------------------------------------------ */
+
+  :global(html[data-motion="reduced"]) .horizon {
+    --lift: 1;
+    --veil: 1;
+    --sun: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .horizon {
+      --lift: 1;
+      --veil: 1;
+      --sun: 1;
+    }
+  }
+
+  @media (max-width: 719.98px) {
+    .horizon {
+      block-size: clamp(9rem, 38vw, 12rem);
+    }
+
+    .sun {
+      inline-size: 2.75rem;
+    }
+
+    .ring[data-ring="inner"] {
+      inline-size: 5.5rem;
+    }
+
+    .ring[data-ring="outer"] {
+      inline-size: 9rem;
+    }
+  }
+}

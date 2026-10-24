@@ -1,0 +1,79 @@
+/*
+ * A switch set as words. The chosen option is white with a solid line under it; the rest are quiet
+ * until hovered. No capsule, no fill, no glow.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .switch {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.25rem clamp(1.25rem, 0.7rem + 1.8vw, 2.5rem);
+    max-inline-size: 100%;
+  }
+
+  .option {
+    position: relative;
+    padding-block: 0.6rem;
+    color: var(--text-3);
+    font: 500 var(--fs-md) / 1.2 var(--font-display);
+    letter-spacing: 0.005em;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-2) var(--ease-out);
+  }
+
+  .switch[data-size="lg"] .option {
+    font-size: clamp(1.0625rem, 0.98rem + 0.45vw, 1.3125rem);
+  }
+
+  @media (pointer: coarse) {
+    .option {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--touch-min);
+    }
+  }
+
+  .option::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    block-size: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  .option:hover {
+    color: var(--text-1);
+  }
+
+  .option[aria-checked="true"] {
+    color: var(--text-1);
+  }
+
+  .option[aria-checked="true"]::after {
+    transform: scaleX(1);
+  }
+
+  .option:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 3px;
+  }
+
+  :global(html[data-motion="reduced"]) .option,
+  :global(html[data-motion="reduced"]) .option::after {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .option,
+    :global(html:not([data-motion="full"])) .option::after {
+      transition: none;
+    }
+  }
+}

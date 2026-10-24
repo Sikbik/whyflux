@@ -1,0 +1,470 @@
+/*
+ * View 2, every platform at once. A role="grid" of CSS-grid rows: a sticky first column of platform
+ * names, a rotated header of questions under five group names, and a hexagon in every cell. Flux is
+ * the only blue row; everyone else is steel. The crosshair is two flat translucent bands positioned by
+ * custom properties the component writes on hover and focus (no per-cell state, no re-render).
+ * Solid colour and hairlines only.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .matrix {
+    --first: 12.75rem;
+    --rowh: 46px;
+    --colmin: 64px;
+    display: grid;
+    gap: 1.25rem;
+    min-inline-size: 0;
+  }
+
+  @media (max-width: 1099.98px) {
+    .matrix {
+      --first: 10.25rem;
+    }
+  }
+
+  /* ---- the scroller ----------------------------------------------------------------------------- */
+
+  .scroller {
+    position: relative;
+    overflow-x: auto;
+    overflow-y: clip;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .content {
+    position: relative;
+    min-inline-size: calc(var(--first) + var(--n, 14) * var(--colmin));
+    padding-block-end: 0.75rem;
+  }
+
+  .grid {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ---- rows -------------------------------------------------------------------------------------- */
+
+  .row {
+    display: grid;
+    grid-template-columns: var(--first) repeat(var(--n), minmax(var(--colmin), 1fr));
+    align-items: stretch;
+  }
+
+  .rowGroup {
+    display: block;
+  }
+
+  .rowGroup > .row {
+    min-block-size: var(--rowh);
+    border-block-start: 1px solid var(--line-1);
+    --gl-fill: var(--steel-700);
+    --gl-rim: var(--steel-500);
+  }
+
+  /* Flux: the home row. A flat tint and a bar of solid light at its edge. */
+  .rowGroup > .row[data-kind="flux"] {
+    --gl-fill: var(--accent);
+    --gl-rim: var(--accent-strong);
+    border-block-start: 0;
+    border-block-end: 1px solid rgb(var(--accent-rgb) / 0.4);
+    background: rgb(var(--accent-rgb) / 0.1);
+  }
+
+  .kindRow {
+    display: flex;
+    align-items: center;
+    min-block-size: 2.4rem;
+    padding-inline: 1rem;
+    border-block-start: 1px solid var(--line-2);
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+    letter-spacing: 0.01em;
+  }
+
+  .corner {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 5;
+    background: var(--void);
+  }
+
+  /* ---- headers --------------------------------------------------------------------------------- */
+
+  .groupHead {
+    border-block-end: 0;
+  }
+
+  .groupCell {
+    display: flex;
+    align-items: flex-end;
+    min-inline-size: 0;
+    margin-inline: 2px;
+    padding: 0 0.15rem 0.5rem;
+    border-block-end: 1px solid var(--line-2);
+    color: var(--text-2);
+    font: 500 var(--fs-xs) / 1 var(--font-display);
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .groupCell > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dimHead {
+    align-items: end;
+  }
+
+  .dimCell {
+    position: relative;
+    display: flex;
+    min-inline-size: 0;
+  }
+
+  .dimBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    inline-size: 100%;
+    min-block-size: 8.25rem;
+    padding: 0.25rem 0.1rem 0.5rem;
+    color: var(--text-3);
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .dimLabel {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    max-block-size: 6.75rem;
+    max-height: 6.75rem;
+    overflow: hidden;
+    font: 500 0.75rem / 1.2 var(--font-display);
+    letter-spacing: 0.005em;
+    text-align: start;
+    text-wrap: balance;
+  }
+
+  .sortIcon {
+    flex: none;
+    opacity: 0.3;
+    transition: opacity var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+  }
+
+  .dimBtn:hover,
+  .dimCell[data-lit] .dimBtn {
+    color: var(--text-1);
+  }
+
+  .dimBtn:hover .sortIcon,
+  .dimCell[data-lit] .sortIcon {
+    opacity: 0.9;
+  }
+
+  .dimCell[data-sorted] .dimBtn {
+    color: var(--accent-strong);
+  }
+
+  .dimCell[data-sorted] .sortIcon {
+    color: var(--accent-strong);
+    opacity: 1;
+  }
+
+  .dimBtn:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
+
+  /* ---- row headers --------------------------------------------------------------------------------- */
+
+  .rowHdr {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    min-inline-size: 0;
+    padding-inline: 1rem 0.5rem;
+    background: var(--void);
+    color: var(--text-2);
+    font: 500 var(--fs-sm) / 1.2 var(--font-display);
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  /* A solid 3px bar of light at the edge of the home row, and of a row a link named. */
+  .rowHdr::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 3px;
+    background: transparent;
+  }
+
+  .row[data-kind="flux"] .rowHdr {
+    background: color-mix(in srgb, var(--accent) 12%, var(--void));
+    color: var(--text-1);
+  }
+
+  .row[data-kind="flux"] .rowHdr::before {
+    background: var(--accent);
+  }
+
+  .name,
+  .nameBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-inline-size: 0;
+    text-align: start;
+  }
+
+  .name b {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .nameBtn {
+    color: inherit;
+    font: inherit;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .nameBtn:hover {
+    color: var(--text-1);
+  }
+
+  .nameBtn:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+
+  .rowHdr[data-lit] {
+    color: var(--text-1);
+  }
+
+  /* The way into head to head: an arrow that comes in beside the name. */
+  .go {
+    flex: none;
+    color: var(--accent-text);
+    opacity: 0;
+    translate: -4px 0;
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      translate var(--dur-2) var(--ease-out);
+  }
+
+  .nameBtn:hover .go,
+  .nameBtn:focus-visible .go,
+  .row[data-picked] .go {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* A platform a link named: its row is tinted and its name is white. */
+  .rowGroup > .row[data-picked] {
+    background: rgb(var(--accent-rgb) / 0.07);
+  }
+
+  .row[data-picked] .rowHdr {
+    background: color-mix(in srgb, var(--accent) 7%, var(--void));
+    color: var(--text-1);
+    font-weight: 700;
+  }
+
+  .row[data-picked] .rowHdr::before {
+    background: var(--steel-300);
+  }
+
+  /* ---- cells --------------------------------------------------------------------------------------- */
+
+  .cell {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    min-inline-size: 0;
+  }
+
+  .cellBtn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    block-size: 100%;
+    min-block-size: var(--rowh);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .cellBtn:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -5px;
+  }
+
+  .cellBtn:hover,
+  .cellBtn:focus-visible {
+    --gl-fill: var(--accent-strong);
+    --gl-rim: var(--hot);
+  }
+
+  /* The score, on a small hexagonal badge, when you look closer. */
+  .digit {
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-start: 50%;
+    display: grid;
+    place-items: center;
+    inline-size: 20px;
+    block-size: 23px;
+    translate: -50% -50%;
+    clip-path: var(--hex-clip);
+    background: var(--ink-0);
+    color: var(--text-1);
+    font: 600 0.6875rem / 1 var(--font-display);
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    scale: 0.6;
+    pointer-events: none;
+    transition: opacity var(--dur-1) var(--ease-out), scale var(--dur-2) var(--ease-snap);
+  }
+
+  .cellBtn:hover .digit,
+  .cellBtn:focus-visible .digit {
+    opacity: 1;
+    scale: 1;
+  }
+
+  .ring {
+    --ring: var(--hot);
+    animation: ring-in var(--dur-3) var(--ease-snap) both;
+  }
+
+  @keyframes ring-in {
+    from {
+      opacity: 0;
+      scale: 0.7;
+    }
+  }
+
+  .missing {
+    display: block;
+    inline-size: 10px;
+    block-size: 1px;
+    margin: auto;
+    background: var(--text-4);
+  }
+
+  /* ---- the reveal: cells arrive on a diagonal ------------------------------------------------------- */
+
+  .content[data-shown="false"] .cellBtn {
+    opacity: 0;
+    scale: 0.55;
+  }
+
+  .content[data-shown="true"] .cellBtn {
+    animation: pop 520ms var(--ease-out) both;
+    animation-delay: calc(min(600, (var(--r, 0) + var(--c, 0)) * 10) * 1ms);
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      scale: 0.55;
+    }
+  }
+
+  /* ---- the crosshair ----------------------------------------------------------------------------------- */
+
+  .cross {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-1) var(--ease-out);
+  }
+
+  .cross[data-on="true"] {
+    opacity: 1;
+  }
+
+  .crossRow,
+  .crossCol {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    background: rgb(var(--accent-rgb) / 0.09);
+    transition:
+      translate var(--dur-2) var(--ease-out),
+      inline-size var(--dur-2) var(--ease-out),
+      block-size var(--dur-2) var(--ease-out);
+  }
+
+  .crossRow {
+    inline-size: 100%;
+    block-size: var(--h, 0px);
+    translate: 0 var(--y, 0px);
+    border-block: 1px solid rgb(var(--accent-rgb) / 0.4);
+  }
+
+  .crossCol {
+    block-size: 100%;
+    inline-size: var(--w, 0px);
+    translate: var(--x, 0px) 0;
+    border-inline: 1px solid rgb(var(--accent-rgb) / 0.4);
+  }
+
+  .cross[data-kind="head"] .crossRow {
+    opacity: 0;
+  }
+
+  /* ---- under the grid: the key, and the way to the rubric ----------------------------------------------- */
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    padding-inline: 1rem;
+  }
+
+  :global(html[data-motion="reduced"]) .content[data-shown="false"] .cellBtn {
+    opacity: 1;
+    scale: 1;
+  }
+
+  :global(html[data-motion="reduced"]) .content[data-shown="true"] .cellBtn,
+  :global(html[data-motion="reduced"]) .ring {
+    animation: none;
+  }
+
+  :global(html[data-motion="reduced"]) .crossRow,
+  :global(html[data-motion="reduced"]) .crossCol,
+  :global(html[data-motion="reduced"]) .digit {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .content[data-shown="false"] .cellBtn {
+      opacity: 1;
+      scale: 1;
+    }
+
+    :global(html:not([data-motion="full"])) .content[data-shown="true"] .cellBtn,
+    :global(html:not([data-motion="full"])) .ring {
+      animation: none;
+    }
+
+    :global(html:not([data-motion="full"])) .crossRow,
+    :global(html:not([data-motion="full"])) .crossCol,
+    :global(html:not([data-motion="full"])) .digit {
+      transition: none;
+    }
+  }
+}

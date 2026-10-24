@@ -1,0 +1,452 @@
+/*
+ * The stage: the app at the center of its layers, and the operator at the left. One coordinate space
+ * (the viewBox, see geometry.ts) shared by the SVG and the HTML laid over it, so the picture scales as
+ * one piece. Layers, bottom to top: the crystal art, the SVG (rings, marks, cracks, the current attempt's
+ * beam), then the operator. Solid colour and crisp lines only: no blur, no glow, no gradients. Motion is
+ * CSS keyframes restarted by remounting on `seq`.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .stage {
+    position: relative;
+    inline-size: 100%;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .crystal {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  /* ---- the rings -------------------------------------------------------------------------------- */
+
+  .ring {
+    fill: none;
+    stroke-width: 2;
+    stroke-linejoin: miter;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      stroke-dasharray 900ms var(--ease-out) calc(var(--i, 0) * 70ms),
+      stroke-dashoffset 900ms var(--ease-out) calc(var(--i, 0) * 70ms),
+      stroke var(--dur-3) var(--ease-out),
+      stroke-opacity var(--dur-3) var(--ease-out),
+      stroke-width var(--dur-2) var(--ease-out);
+  }
+
+  /* Closed: every attempt this layer decides is denied. */
+  .ring[data-verdict="no"] {
+    stroke: var(--accent);
+    stroke-opacity: 0.92;
+  }
+
+  /* Gapped: some are only limited. */
+  .ring[data-verdict="partial"] {
+    stroke: var(--status-warn);
+    stroke-opacity: 0.8;
+  }
+
+  /* Open: some get in. Short dashes, a fence with nothing holding it shut. */
+  .ring[data-verdict="yes"] {
+    stroke: var(--steel-500);
+    stroke-opacity: 0.6;
+  }
+
+  /* The ring an attempt is aimed at: a firmer, brighter line. No glow. */
+  .ring[data-hot] {
+    stroke-width: 3;
+    stroke-opacity: 1;
+  }
+
+  .ring[data-verdict="no"][data-hot] {
+    stroke: var(--accent-strong);
+  }
+
+  .ring[data-verdict="yes"][data-hot] {
+    stroke: var(--steel-100);
+  }
+
+  /* The layers draw themselves in, outside to inside, when the stage first comes into view. */
+  .stage:not([data-arrived]) .ring {
+    opacity: 0;
+  }
+
+  .stage[data-arrived] .ring {
+    animation: ring-in 1100ms var(--ease-out) calc(var(--i, 0) * 150ms) both;
+  }
+
+  @keyframes ring-in {
+    from {
+      opacity: 0;
+      scale: 1.07;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* When a run ends on an ArcaneOS node every layer answers once more, outside to inside: sealed. */
+  .wave {
+    fill: none;
+    stroke: var(--accent-strong);
+    stroke-width: 1.75;
+    opacity: 0;
+    animation: wave 1000ms var(--ease-out) calc(var(--i, 0) * 150ms) both;
+  }
+
+  @keyframes wave {
+    0% {
+      opacity: 0;
+      stroke-width: 1.75;
+    }
+    30% {
+      opacity: 1;
+      stroke-width: 3.6;
+    }
+    100% {
+      opacity: 0;
+      stroke-width: 1.75;
+    }
+  }
+
+  /* ---- what has been tried stays ---------------------------------------------------------------------- */
+
+  .mark,
+  .event {
+    --v-rgb: var(--accent-rgb);
+    --flash-rgb: 206 218 240;
+  }
+
+  .mark[data-verdict="partial"],
+  .event[data-verdict="partial"] {
+    --v-rgb: var(--status-warn-rgb);
+    --flash-rgb: 255 214 170;
+  }
+
+  .mark[data-verdict="yes"],
+  .event[data-verdict="yes"] {
+    --v-rgb: var(--alarm-rgb);
+    --flash-rgb: 255 190 200;
+  }
+
+  .mark {
+    fill: rgb(var(--v-rgb));
+  }
+
+  .mark[data-new] {
+    opacity: 0;
+    animation: mark-in var(--dur-3) var(--ease-out) var(--beam) both;
+  }
+
+  .crack {
+    fill: none;
+    stroke: rgb(var(--alarm-rgb));
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .crack[data-new] {
+    animation: crack 560ms var(--ease-out) calc(var(--beam) * 0.9) both;
+  }
+
+  /* ---- the beam ------------------------------------------------------------------------------------------- */
+
+  .beam {
+    fill: none;
+    stroke: var(--hot);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-dasharray: 0.2 3;
+    animation: beam var(--beam) cubic-bezier(0.35, 0.05, 0.7, 0.6) both;
+  }
+
+  .event[data-verdict="yes"] .beam {
+    stroke: rgb(255 214 220);
+  }
+
+  /* A faint line left behind, so the path can be read after the beam has landed. */
+  .trace {
+    fill: none;
+    stroke: rgb(var(--v-rgb));
+    stroke-width: 1;
+    opacity: 0;
+    animation: trace calc(var(--beam) * 4) ease-out both;
+  }
+
+  /* The ring that answers: one bright flash around its whole edge, then gone. A crisp line, no glow. */
+  .flare {
+    fill: none;
+    stroke: rgb(var(--flash-rgb));
+    stroke-width: 4.2;
+    opacity: 0;
+    animation: flare 1000ms var(--ease-out) var(--beam) both;
+  }
+
+  /* One thin ring sent outward from the one that answered. */
+  .pulse {
+    fill: none;
+    stroke: rgb(var(--v-rgb));
+    stroke-width: 1.4;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pulse 1300ms var(--ease-out) var(--beam) both;
+  }
+
+  .spark {
+    fill: rgb(var(--v-rgb));
+    opacity: 0;
+    animation: spark 560ms var(--ease-out) var(--beam) both;
+  }
+
+  /* Where a beam gets in: a thin ring spreading from the point of impact. */
+  .leak {
+    fill: none;
+    stroke: rgb(var(--alarm-rgb));
+    stroke-width: 1.6;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: leak 760ms var(--ease-out) calc(var(--beam) * 0.92) both;
+  }
+
+  /* The crystal loses power in steps when something gets in: abrupt, never smooth. */
+  .crystal[data-flicker="a"] {
+    animation: flick-a 620ms steps(1, end) calc(var(--beam) * 0.88) both;
+  }
+
+  .crystal[data-flicker="b"] {
+    animation: flick-b 620ms steps(1, end) calc(var(--beam) * 0.88) both;
+  }
+
+  @keyframes flick-a {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    14% {
+      opacity: 0.3;
+    }
+    30% {
+      opacity: 1;
+    }
+    46% {
+      opacity: 0.55;
+    }
+    62% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes flick-b {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    14% {
+      opacity: 0.3;
+    }
+    30% {
+      opacity: 1;
+    }
+    46% {
+      opacity: 0.55;
+    }
+    62% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes beam {
+    from {
+      stroke-dashoffset: 0.2;
+    }
+    to {
+      stroke-dashoffset: -1.04;
+    }
+  }
+
+  @keyframes trace {
+    0% {
+      opacity: 0;
+    }
+    16% {
+      opacity: 0.55;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes flare {
+    0% {
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    35% {
+      opacity: 0.7;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 0.8;
+      scale: 1;
+    }
+    100% {
+      opacity: 0;
+      scale: 1.1;
+    }
+  }
+
+  @keyframes spark {
+    0% {
+      opacity: 1;
+      translate: 0 0;
+    }
+    100% {
+      opacity: 0;
+      translate: var(--dx) var(--dy);
+    }
+  }
+
+  @keyframes leak {
+    0% {
+      opacity: 1;
+      scale: 0.4;
+    }
+    100% {
+      opacity: 0;
+      scale: 3.6;
+    }
+  }
+
+  @keyframes crack {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes mark-in {
+    from {
+      opacity: 0;
+      scale: 0.2;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* ---- the operator --------------------------------------------------------------------------------------- */
+
+  .operator {
+    position: absolute;
+    z-index: 2;
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+
+  .operatorHex {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: 46px;
+    block-size: 53px;
+    color: var(--accent-strong);
+    isolation: isolate;
+  }
+
+  .operatorHex::before,
+  .operatorHex::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    clip-path: var(--hex-clip);
+  }
+
+  .operatorHex::before {
+    inset: 0;
+    background: rgb(var(--accent-rgb) / 0.85);
+  }
+
+  .operatorHex::after {
+    inset: 1.5px;
+    background: var(--ink-0);
+  }
+
+  .operatorLabel {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    margin-block-start: 0.55rem;
+    white-space: nowrap;
+    color: var(--text-3);
+    font: 500 var(--fs-xs) / 1 var(--font-sans);
+  }
+
+  /* ---- reduced motion: the picture is the end state ------------------------------------------------------------ */
+
+  .stage[data-reduced] .ring {
+    opacity: 1;
+    animation: none;
+    transition:
+      stroke var(--dur-3) var(--ease-out),
+      stroke-opacity var(--dur-3) var(--ease-out),
+      stroke-width var(--dur-2) var(--ease-out);
+  }
+
+  /* ---- phones ---------------------------------------------------------------------------------------------------- */
+
+  @media (max-width: 719.98px) {
+    .ring {
+      stroke-width: 2.2;
+    }
+
+    .ring[data-hot] {
+      stroke-width: 3.4;
+    }
+
+    .crack {
+      stroke-width: 2.2;
+    }
+
+    .operatorHex {
+      inline-size: 32px;
+      block-size: 37px;
+    }
+
+    .operatorHex svg {
+      inline-size: 12px;
+      block-size: 12px;
+    }
+
+    /* The rings start close to the operator here: the hexagon alone is enough. */
+    .operatorLabel {
+      display: none;
+    }
+  }
+}

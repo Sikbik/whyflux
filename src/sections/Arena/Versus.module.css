@@ -1,0 +1,428 @@
+/*
+ * View 1, head to head: the hero. A roster beside a poster (the two names, one big number, one hexagon
+ * per question, the reason) over one row per question with five hexagon pips either side that grow
+ * outward from the middle. Everything sits directly on the page: no boxes, flat colour, hairlines.
+ * Flux is the only blue; the opponent is steel.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .versus {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.25rem, 1rem + 1.5vw, 2rem) clamp(2rem, 1rem + 3.5vw, 4.5rem);
+    min-inline-size: 0;
+  }
+
+  @media (min-width: 900px) {
+    .versus {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .roster {
+      position: sticky;
+      inset-block-start: calc(var(--nav-h, 60px) + 1.5rem);
+    }
+  }
+
+  .main {
+    container: versus / inline-size;
+    display: grid;
+    gap: clamp(2.5rem, 1.75rem + 3.5vw, 5rem);
+    min-inline-size: 0;
+  }
+
+  /* ---- the poster ---------------------------------------------------------------------------- */
+
+  .poster {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.25rem, 1rem + 1.5vw, 2.25rem) clamp(2rem, 1rem + 3vw, 4rem);
+    min-inline-size: 0;
+  }
+
+  @container versus (min-width: 62rem) {
+    .poster {
+      grid-template-columns: 27rem minmax(0, 1fr);
+      grid-template-areas:
+        "names names"
+        "tally say";
+    }
+
+    .names {
+      grid-area: names;
+    }
+
+    .tally {
+      grid-area: tally;
+    }
+
+    .say {
+      grid-area: say;
+    }
+  }
+
+  .names {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.3em;
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-1);
+    font: 300 clamp(2.5rem, 1.1rem + 5.2vw, 5.75rem) / 1.02 var(--font-display);
+    letter-spacing: -0.04em;
+    overflow-wrap: anywhere;
+  }
+
+  .flux {
+    color: var(--accent-strong);
+    font-weight: 700;
+  }
+
+  .vs {
+    padding-inline: 0.12em;
+    color: var(--text-3);
+    font-size: 0.34em;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .rival {
+    animation: swap var(--dur-4) var(--ease-out) both;
+  }
+
+  @keyframes swap {
+    from {
+      opacity: 0;
+      translate: 0.3em 0;
+    }
+  }
+
+  .tally {
+    display: grid;
+    align-content: start;
+    gap: 1.5rem;
+    min-inline-size: 0;
+  }
+
+  .lead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.25rem 1.25rem;
+    max-inline-size: none;
+    margin: 0;
+  }
+
+  .big {
+    color: var(--accent-strong);
+    font: 300 clamp(6rem, 3rem + 10vw, 11.5rem) / 0.78 var(--font-display);
+    letter-spacing: -0.06em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bigCaption {
+    max-inline-size: 10rem;
+    padding-block-end: 0.15em;
+    color: var(--text-2);
+    font: 500 1.0625rem / 1.3 var(--font-display);
+    text-wrap: balance;
+  }
+
+  .strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.7rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stripGroup {
+    display: flex;
+    gap: 2px;
+  }
+
+  .stripHex {
+    display: grid;
+    place-items: center;
+    padding: 3px;
+    --gl-fill: var(--accent);
+    --gl-rim: var(--accent-strong);
+    transition: scale var(--dur-2) var(--ease-snap);
+  }
+
+  .stripHex:not([data-outcome="win"]) {
+    --gl-rim: var(--steel-700);
+  }
+
+  .stripHex:hover {
+    scale: 1.2;
+  }
+
+  .stripHex:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 1px;
+  }
+
+  .say {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 1.25rem;
+    min-inline-size: 0;
+    padding-block-start: 0.25rem;
+    animation: swap var(--dur-4) var(--ease-out) both;
+  }
+
+  .edge {
+    max-inline-size: 56ch;
+    margin: 0;
+    color: var(--text-2);
+    font: 400 clamp(1.0625rem, 1rem + 0.35vw, 1.25rem) / 1.6 var(--font-sans);
+    text-wrap: pretty;
+  }
+
+  /* ---- the rows --------------------------------------------------------------------------------- */
+
+  .rows {
+    display: grid;
+    gap: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+    min-inline-size: 0;
+  }
+
+  .group {
+    display: grid;
+    min-inline-size: 0;
+  }
+
+  /* A group's name, centred on the axis of the rows with a hairline running out either side. */
+  .groupName {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 0 0 0.35rem;
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+    letter-spacing: 0.01em;
+  }
+
+  .groupName::before,
+  .groupName::after {
+    content: "";
+    flex: 1;
+    block-size: 1px;
+    background: var(--line-2);
+  }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(11rem, 16rem) minmax(0, 1fr);
+    align-items: center;
+    gap: 0 clamp(0.5rem, 0.2rem + 1.4vw, 1.5rem);
+    border-block-end: 1px solid var(--line-1);
+    scroll-margin-block: 30vh;
+  }
+
+  .row[data-flash] {
+    animation: flash 1.2s var(--ease-out);
+  }
+
+  @keyframes flash {
+    0%,
+    60% {
+      background: rgb(var(--accent-rgb) / 0.16);
+    }
+  }
+
+  .name {
+    padding-block: 0.9rem;
+    color: var(--text-2);
+    font: 500 var(--fs-md) / 1.25 var(--font-display);
+    letter-spacing: -0.005em;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .row[data-outcome="win"] .name {
+    color: var(--text-1);
+  }
+
+  .side {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    min-inline-size: 0;
+    padding: 0.55rem 0.75rem;
+    color: var(--text-3);
+    text-align: start;
+    cursor: pointer;
+    transition: background var(--dur-2) var(--ease-out);
+  }
+
+  .side[data-side="flux"] {
+    justify-content: flex-end;
+    text-align: end;
+    --gl-fill: var(--accent);
+  }
+
+  .side[data-side="rival"] {
+    --gl-fill: var(--steel-500);
+  }
+
+  .side:hover,
+  .side[data-open] {
+    background: rgb(var(--accent-rgb) / 0.07);
+  }
+
+  .side:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
+
+  .meter {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .score {
+    min-inline-size: 1.25ch;
+    font: 300 1.875rem / 1 var(--font-display);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  .side[data-side="flux"] .score {
+    color: var(--text-1);
+  }
+
+  .side[data-side="rival"] .score {
+    color: var(--text-3);
+  }
+
+  .na {
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.2 var(--font-sans);
+  }
+
+  /* The one-line answer lives in the empty space beside the pips and comes up on hover or focus. */
+  .short {
+    display: none;
+    flex: 1 1 0;
+    min-inline-size: 0;
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+    text-wrap: balance;
+    opacity: 0;
+    transition: opacity var(--dur-2) var(--ease-out);
+  }
+
+  @container versus (min-width: 62rem) {
+    .short {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      overflow: hidden;
+    }
+  }
+
+  .side[data-side="flux"] .short {
+    text-align: end;
+  }
+
+  .row:hover .short,
+  .row:focus-within .short {
+    opacity: 1;
+  }
+
+  /* ---- the way on --------------------------------------------------------------------------------- */
+
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 2.25rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--line-1);
+  }
+
+  .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0;
+    background: none;
+    font: 500 var(--fs-md) / 1.2 var(--font-display);
+    text-align: start;
+    cursor: pointer;
+  }
+
+  /* ---- phones: the name moves above the two sides ---------------------------------------------------- */
+
+  @media (max-width: 719.98px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-areas:
+        "name name"
+        "flux rival";
+      gap: 0 0.5rem;
+    }
+
+    .name {
+      grid-area: name;
+      padding-block: 0.9rem 0.1rem;
+    }
+
+    .side {
+      gap: 0.5rem;
+      padding-inline: 0.25rem;
+    }
+
+    .side[data-side="flux"] {
+      grid-area: flux;
+    }
+
+    .side[data-side="rival"] {
+      grid-area: rival;
+    }
+
+    .meter {
+      gap: 0.5rem;
+    }
+
+    .meter svg {
+      inline-size: 17px;
+      block-size: auto;
+    }
+
+    .score {
+      font-size: 1.5rem;
+    }
+
+    .big {
+      font-size: 7rem;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .rival,
+  :global(html[data-motion="reduced"]) .say,
+  :global(html[data-motion="reduced"]) .row[data-flash] {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .rival,
+    :global(html:not([data-motion="full"])) .say,
+    :global(html:not([data-motion="full"])) .row[data-flash] {
+      animation: none;
+    }
+  }
+}

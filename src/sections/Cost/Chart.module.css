@@ -1,0 +1,7 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .chart {
+    min-inline-size: 0;
+  }
+}

@@ -1,0 +1,47 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .tip {
+    position: fixed;
+    z-index: var(--z-tooltip);
+    max-inline-size: min(320px, calc(100vw - 16px));
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--line-blue);
+    border-radius: var(--r-sm);
+    background: rgb(var(--ink-0-rgb) / 0.94);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: var(--text-2);
+    font: 400 var(--fs-sm) / var(--lh-normal) var(--font-sans);
+    pointer-events: none;
+    animation: in var(--dur-2) var(--ease-out) both;
+  }
+
+  @keyframes in {
+    from {
+      opacity: 0;
+      translate: 0 4px;
+    }
+  }
+
+  .tip[data-placement="bottom"] {
+    animation-name: in-b;
+  }
+
+  @keyframes in-b {
+    from {
+      opacity: 0;
+      translate: 0 -4px;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .tip {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .tip {
+      animation: none;
+    }
+  }
+}

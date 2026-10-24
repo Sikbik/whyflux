@@ -1,0 +1,109 @@
+/*
+ * The caption under the orbit: type on the page, centered under the picture it names. All entries
+ * share one grid cell, so the block is always as tall as the longest and nothing below it moves.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .caption {
+    display: grid;
+    justify-items: center;
+    margin-block-start: clamp(0.5rem, 0.2rem + 1vw, 1.5rem);
+    text-align: center;
+  }
+
+  .entry {
+    grid-area: 1 / 1;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 0.7rem;
+    max-inline-size: 46rem;
+    min-inline-size: 0;
+    opacity: 0;
+    visibility: hidden;
+    translate: 0 8px;
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      translate var(--dur-2) var(--ease-out),
+      visibility 0s linear var(--dur-2);
+  }
+
+  .entry[data-active="true"] {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    transition:
+      opacity var(--dur-3) var(--ease-out) 60ms,
+      translate var(--dur-3) var(--ease-out) 60ms,
+      visibility 0s;
+  }
+
+  .family {
+    margin: 0;
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-sans);
+    letter-spacing: 0.04em;
+  }
+
+  .family b {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  .name {
+    margin: 0;
+    color: var(--text-1);
+    font: 600 clamp(1.875rem, 1.2rem + 2.2vw, 3rem) / 1.08 var(--font-display);
+    letter-spacing: var(--tracking-h2);
+    text-wrap: balance;
+  }
+
+  .line {
+    max-inline-size: 38ch;
+    margin: 0;
+    color: var(--text-2);
+    font: var(--type-lead);
+    text-wrap: balance;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem 1.75rem;
+    margin: 0.4rem 0 0;
+  }
+
+  .open {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-block-size: 2.75rem;
+    color: var(--accent-strong);
+    font: 600 var(--fs-md) / 1 var(--font-display);
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--accent-rgb) / 0.45);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.35em;
+    transition:
+      color var(--dur-1) var(--ease-out),
+      text-decoration-color var(--dur-1) var(--ease-out);
+  }
+
+  .open:hover {
+    color: var(--text-1);
+    text-decoration-color: currentColor;
+  }
+
+  @media (max-width: 719.98px) {
+    .entry {
+      gap: 0.55rem;
+    }
+
+    .line {
+      max-inline-size: 30ch;
+    }
+  }
+}

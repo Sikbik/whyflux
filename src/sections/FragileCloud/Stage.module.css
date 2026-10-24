@@ -1,0 +1,536 @@
+/*
+ * The blackout stage. A full-bleed band set directly on the page: no panel, no tiles. The type is the
+ * whole show: the incident's name, a giant number that counts the downtime up, and the services named
+ * in its reports set as a poster of big names. Each name has two faces, the dead one (always there:
+ * steel, struck through in alarm red once it is out) and the lit one on top (white) which flickers out
+ * in hard steps when the stage goes dark. The room goes with them: a solid layer behind the type
+ * flickers in over the band. Solid colour, hairlines and hard-edged light only: no gradients, no glow.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .stage {
+    --lit: #0e131b;
+    --out: #020307;
+    position: relative;
+    isolation: isolate;
+    background: var(--lit);
+    border-block-start: 1px solid var(--line-2);
+    scroll-margin-block-start: 4rem;
+  }
+
+  /* The room: solid, behind the type, and off while the services are lit. */
+  .stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--out);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .stage[data-dark]::before {
+    animation: room 900ms steps(1, end) both;
+  }
+
+  @keyframes room {
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.45;
+    }
+    18% {
+      opacity: 0;
+    }
+    32% {
+      opacity: 0.6;
+    }
+    40% {
+      opacity: 0.15;
+    }
+    58% {
+      opacity: 0.8;
+    }
+    66% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .inner {
+    display: grid;
+    gap: clamp(1.5rem, 0.9rem + 2.4vw, 3rem);
+    padding-block: clamp(1.25rem, 0.6rem + 2vw, 2.5rem) clamp(2.25rem, 1.4rem + 3vw, 4rem);
+    min-inline-size: 0;
+  }
+
+  /* ---- the controls: plain words ------------------------------------------------------------------------- */
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 1.75rem;
+  }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 clamp(1.1rem, 0.6rem + 1.8vw, 2rem);
+  }
+
+  .tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-min);
+    padding: 0;
+    color: var(--text-3);
+    font: 500 var(--fs-md) / 1.2 var(--font-display);
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .tab::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0.55rem;
+    block-size: 1px;
+    background: currentColor;
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale var(--dur-2) var(--ease-out);
+  }
+
+  .tab:hover {
+    color: var(--text-2);
+  }
+
+  .tab[aria-checked="true"] {
+    color: var(--text-1);
+  }
+
+  .tab[aria-checked="true"]::after {
+    scale: 1 1;
+  }
+
+  .tab:focus-visible,
+  .action:focus-visible,
+  .details:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 3px;
+  }
+
+  .action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-block-size: var(--touch-min);
+    padding: 0;
+    color: var(--text-2);
+    font: 500 var(--fs-md) / 1.2 var(--font-display);
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .action:hover {
+    color: var(--text-1);
+  }
+
+  /* ---- the scene ----------------------------------------------------------------------------------------- */
+
+  .scene {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "head names"
+      "read names"
+      "record names";
+    column-gap: clamp(2rem, 7vw, 7rem);
+    row-gap: clamp(0.9rem, 0.5rem + 1.4vw, 1.75rem);
+    align-items: start;
+    min-inline-size: 0;
+  }
+
+  .head {
+    grid-area: head;
+    min-inline-size: 0;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 1.1rem;
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1.4 var(--font-sans);
+  }
+
+  .provider {
+    color: var(--text-1);
+    font-weight: 700;
+  }
+
+  .title {
+    max-inline-size: 24ch;
+    margin: 0.6rem 0 0;
+    color: var(--text-1);
+    font: 600 clamp(1.3rem, 1rem + 1.1vw, 1.9rem) / 1.18 var(--font-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /* ---- the number ---------------------------------------------------------------------------------------- */
+
+  .read {
+    grid-area: read;
+    display: grid;
+    gap: 0.9rem;
+    max-inline-size: none;
+    min-block-size: clamp(7rem, 4rem + 9vw, 12rem);
+    margin: 0;
+    align-content: start;
+    min-inline-size: 0;
+  }
+
+  .num {
+    color: rgb(var(--accent-rgb) / 0.32);
+    font: 300 clamp(5rem, 2.4rem + 10.5vw, 11.5rem) / 0.8 var(--font-display);
+    letter-spacing: -0.055em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scene[data-dark] .num {
+    color: var(--text-1);
+  }
+
+  .unit {
+    color: var(--text-2);
+    font: 500 clamp(1.1rem, 0.9rem + 0.8vw, 1.6rem) / 1.1 var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  .off {
+    color: var(--text-3);
+  }
+
+  .scene[data-dark] .off {
+    color: rgb(var(--alarm-rgb));
+    font-weight: 700;
+  }
+
+  .word {
+    color: var(--text-1);
+    font: 300 clamp(3.4rem, 1.8rem + 6vw, 7.5rem) / 0.9 var(--font-display);
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+    opacity: 0;
+  }
+
+  .read[data-long] .word {
+    font-size: clamp(2.6rem, 1.5rem + 4vw, 5rem);
+    line-height: 0.95;
+  }
+
+  .scene[data-dark] .word {
+    animation: word-in 760ms steps(1, end) 120ms both;
+  }
+
+  @keyframes word-in {
+    0% {
+      opacity: 0;
+    }
+    14% {
+      opacity: 1;
+    }
+    26% {
+      opacity: 0.12;
+    }
+    40% {
+      opacity: 1;
+    }
+    52% {
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* ---- the names ----------------------------------------------------------------------------------------- */
+
+  .names {
+    grid-area: names;
+    align-self: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.12em 0.6em;
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.028em;
+    line-height: 1.04;
+  }
+
+  .scene[data-size="one"] .names {
+    font-size: clamp(2.9rem, 1.3rem + 6.4vw, 6.6rem);
+  }
+
+  .scene[data-size="few"] .names {
+    font-size: clamp(2.4rem, 1.3rem + 4.2vw, 5rem);
+  }
+
+  .scene[data-size="some"] .names {
+    font-size: clamp(1.9rem, 1.2rem + 2.8vw, 3.7rem);
+  }
+
+  .scene[data-size="many"] .names {
+    font-size: clamp(1.65rem, 1.1rem + 2vw, 3rem);
+  }
+
+  .scene[data-size="lots"] .names {
+    font-size: clamp(1.45rem, 1rem + 1.4vw, 2.4rem);
+  }
+
+  .name {
+    position: relative;
+    display: inline-block;
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .dead {
+    display: block;
+    color: rgb(var(--accent-rgb) / 0.6);
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: transparent;
+  }
+
+  .name[data-more] .dead {
+    text-decoration: none;
+  }
+
+  .lit {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    color: var(--text-1);
+  }
+
+  /* The blackout: hard steps, never a smooth fade. A power loss is abrupt. */
+  .scene[data-dark] .lit {
+    animation: flicker calc(820ms / var(--speed)) steps(1, end) var(--d) forwards;
+  }
+
+  /* Once a name is out it is struck through. */
+  .scene[data-dark] .dead {
+    animation: struck 1ms steps(1, start) calc(var(--d) + 820ms / var(--speed)) forwards;
+  }
+
+  @keyframes flicker {
+    0% {
+      opacity: 1;
+    }
+    8% {
+      opacity: 0.16;
+    }
+    16% {
+      opacity: 1;
+    }
+    30% {
+      opacity: 0.08;
+    }
+    38% {
+      opacity: 0.85;
+    }
+    54% {
+      opacity: 0.04;
+    }
+    62% {
+      opacity: 0.5;
+    }
+    78%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes struck {
+    to {
+      text-decoration-color: rgb(var(--alarm-rgb) / 0.75);
+    }
+  }
+
+  /* ---- the receipts -------------------------------------------------------------------------------------- */
+
+  .record {
+    grid-area: record;
+    align-self: end;
+  }
+
+  .details {
+    gap: 0.4rem;
+    min-block-size: var(--touch-min);
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-sans);
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .details:hover,
+  .details[aria-expanded="true"] {
+    color: var(--text-1);
+  }
+
+  .panel {
+    max-inline-size: min(26rem, calc(100vw - 1rem));
+  }
+
+  .impact {
+    max-inline-size: none;
+    margin: 0 0 1rem;
+    color: var(--text-1);
+    font: 400 var(--fs-sm) / 1.6 var(--font-sans);
+  }
+
+  .sub {
+    max-inline-size: none;
+    margin: 1.1rem 0 0.55rem;
+    color: var(--text-3);
+    font: 500 var(--fs-xs) / 1.3 var(--font-sans);
+  }
+
+  .sources {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sources a {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--accent-rgb) / 0.4);
+    text-underline-offset: 0.2em;
+    overflow-wrap: anywhere;
+  }
+
+  .sources a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .accessed {
+    display: block;
+    color: var(--text-3);
+    font: 400 var(--fs-xs) / 1.4 var(--font-mono);
+  }
+
+  /* ---- the ruler's slot ---------------------------------------------------------------------------------- */
+
+  .timeline {
+    min-inline-size: 0;
+  }
+
+  /* ---- narrow: one column ------------------------------------------------------------------------------- */
+
+  @media (max-width: 859.98px) {
+    .scene {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      grid-template-areas:
+        "head"
+        "read"
+        "names"
+        "record";
+      row-gap: clamp(1rem, 0.6rem + 2vw, 1.75rem);
+    }
+
+    .read {
+      min-block-size: 0;
+    }
+
+    .names {
+      align-self: start;
+    }
+
+    .record {
+      align-self: start;
+    }
+  }
+
+  @media (max-width: 719.98px) {
+    .num {
+      font-size: clamp(4.6rem, 3.4rem + 12vw, 7rem);
+    }
+
+    .word {
+      font-size: clamp(3rem, 2.2rem + 7vw, 4.8rem);
+    }
+
+    .read[data-long] .word {
+      font-size: clamp(2.4rem, 1.9rem + 5vw, 3.6rem);
+    }
+
+    .top {
+      row-gap: 0;
+    }
+  }
+
+  /* ---- reduced motion: the dark end state at once, no flicker -------------------------------------------- */
+
+  :global(html[data-motion="reduced"]) .stage[data-dark]::before {
+    animation: none;
+    opacity: 1;
+  }
+
+  :global(html[data-motion="reduced"]) .scene[data-dark] .lit {
+    animation: none;
+    opacity: 0;
+  }
+
+  :global(html[data-motion="reduced"]) .scene[data-dark] .dead {
+    animation: none;
+    text-decoration-color: rgb(var(--alarm-rgb) / 0.75);
+  }
+
+  :global(html[data-motion="reduced"]) .scene[data-dark] .word {
+    animation: none;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .stage[data-dark]::before {
+      animation: none;
+      opacity: 1;
+    }
+
+    :global(html:not([data-motion="full"])) .scene[data-dark] .lit {
+      animation: none;
+      opacity: 0;
+    }
+
+    :global(html:not([data-motion="full"])) .scene[data-dark] .dead {
+      animation: none;
+      text-decoration-color: rgb(var(--alarm-rgb) / 0.75);
+    }
+
+    :global(html:not([data-motion="full"])) .scene[data-dark] .word {
+      animation: none;
+      opacity: 1;
+    }
+  }
+}

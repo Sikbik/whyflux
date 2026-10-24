@@ -1,0 +1,25 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .section {
+    position: relative;
+    isolation: isolate;
+    /* Plates bleed; the page never scrolls sideways. `clip` (not hidden) keeps
+       position: sticky working for pinned stories inside. */
+    overflow: clip;
+    scroll-margin-block-start: 0;
+  }
+
+  .section[data-pad="default"] {
+    padding-block: var(--section-y);
+  }
+
+  .section[data-pad="tight"] {
+    padding-block: calc(var(--section-y) * 0.55);
+  }
+
+  .inner {
+    position: relative;
+    z-index: 1;
+  }
+}

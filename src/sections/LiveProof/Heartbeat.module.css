@@ -1,0 +1,301 @@
+/*
+ * The heartbeat: the height as a monument, a hexagon that fills over one block time, and a ledger of
+ * the latest blocks, each by its full height, sliding left as new ones land. Set on the page, ruled
+ * once along the top. Solid strokes only: no glow, no mask.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .root {
+    margin-block-start: clamp(5rem, 3rem + 7vw, 9rem);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 1rem + 3vw, 4rem);
+    align-items: center;
+    padding-block-start: clamp(1rem, 0.8rem + 0.8vw, 1.5rem);
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .copy {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+    min-inline-size: 0;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0;
+    color: var(--text-2);
+    font: 500 var(--fs-md) / 1.25 var(--font-sans);
+  }
+
+  .est {
+    color: var(--text-3);
+    font-weight: 400;
+  }
+
+  .height {
+    margin-block: 0.1em 0.05em;
+    color: var(--text-1);
+    font: 300 clamp(3rem, 0.4rem + 8.2vw, 8.5rem) / 0.95 var(--font-display);
+    letter-spacing: -0.055em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .sentence {
+    max-inline-size: 48ch;
+    margin: 0;
+    color: var(--text-2);
+    font: var(--type-body);
+    font-size: var(--fs-md);
+  }
+
+  .sentence b {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  /* ---- the hexagon ---------------------------------------------------------------------------------- */
+
+  .gauge {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  .dial {
+    --dial: clamp(11rem, 8rem + 9vw, 16rem);
+    position: relative;
+    inline-size: var(--dial);
+    aspect-ratio: 1;
+  }
+
+  .svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  .track {
+    fill: none;
+    stroke: var(--line-3);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+  }
+
+  .fill {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.4;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  /* A block lands: one white hexagon leaves the outline and fades. */
+  .ring {
+    fill: none;
+    stroke: var(--hot);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    transform-origin: 50% 50%;
+    transform-box: view-box;
+    opacity: 0;
+    animation: beat-ring 1.5s var(--ease-out) both;
+  }
+
+  @keyframes beat-ring {
+    from {
+      opacity: 0.95;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 1.55;
+    }
+  }
+
+  .center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.2em;
+    margin: 0;
+    padding-block-start: 31%;
+    color: var(--text-1);
+    font: 300 clamp(2.5rem, 1.6rem + 3vw, 4.25rem) / 1 var(--font-display);
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sUnit {
+    color: var(--text-3);
+    font: 500 0.3em / 1 var(--font-display);
+    letter-spacing: 0.02em;
+  }
+
+  .caption {
+    margin: 0;
+    color: var(--text-3);
+    font-size: var(--fs-md);
+    line-height: 1.4;
+  }
+
+  /* ---- the tape ------------------------------------------------------------------------------------------ */
+
+  .tapeWrap {
+    container-type: inline-size;
+  }
+
+  /*
+   * A ledger: a hairline for the chain, a hexagon on it for each block, the block's full height set
+   * under it. Newest at the right edge; the others step left at an even pitch that fills the width.
+   * A cell is exactly as wide as the number in it, so the oldest number starts at the text column and
+   * the newest ends at the right edge.
+   */
+  .tape {
+    --node: 2rem;
+    --cell: calc(var(--chars) * (1ch + 0.02em));
+    --pitch: calc((100cqw - var(--cell)) / (var(--n) - 1));
+    --fade: calc(0.45 / (var(--n) - 1));
+    position: relative;
+    block-size: calc(var(--node) + 0.8rem + 1em);
+    margin: clamp(2rem, 1.2rem + 3vw, 3.5rem) 0 0;
+    padding: 0;
+    list-style: none;
+    font: 500 0.875rem / 1 var(--font-mono);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The chain: it runs in from the past on the left and ends at the newest block. */
+  .tape::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0 calc(var(--cell) / 2);
+    inset-block-start: calc(var(--node) / 2);
+    block-size: 1px;
+    background: var(--line-3);
+  }
+
+  .block {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    inline-size: var(--cell);
+    display: grid;
+    justify-items: center;
+    row-gap: 0.8rem;
+    translate: calc(var(--i) * var(--pitch) * -1) 0;
+    /* The older the block, the quieter it is: steps of opacity, not a fade. */
+    opacity: calc(1 - var(--i) * var(--fade));
+    transition:
+      translate 700ms var(--ease-out),
+      opacity 700ms var(--ease-out);
+    animation: block-in 800ms var(--ease-out) both;
+    animation-delay: calc(var(--i) * 45ms);
+  }
+
+  /* Until the tape has been shown, a block is already where it will stay: nothing slides while it finds its size. */
+  .tape:not([data-settled]) .block {
+    transition: none;
+  }
+
+  /* The one past the oldest: a block on its way out, gone by the time it has slid a full step. */
+  .block[data-leaving="true"] {
+    opacity: 0;
+    animation: none;
+  }
+
+  @keyframes block-in {
+    from {
+      scale: 0.4;
+      opacity: 0;
+    }
+  }
+
+  .node {
+    inline-size: var(--node);
+    block-size: var(--node);
+    overflow: visible;
+  }
+
+  .node path {
+    fill: var(--ink-0);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    transition:
+      fill 500ms var(--ease-out),
+      stroke 500ms var(--ease-out);
+  }
+
+  .block[data-latest="true"] .node path {
+    fill: var(--accent-800);
+    stroke: var(--hot);
+  }
+
+  .num {
+    color: var(--text-2);
+    white-space: nowrap;
+    transition: color 500ms var(--ease-out);
+  }
+
+  .block[data-latest="true"] .num {
+    color: var(--hot);
+    font-weight: 600;
+  }
+
+  @media (max-width: 719.98px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: start;
+    }
+
+    .gauge {
+      justify-items: start;
+      text-align: start;
+    }
+
+    /* The hexagon is drawn inside a margin of its own (9% each side): pull it left so its edge meets the text column. */
+    .dial {
+      margin-inline-start: calc(var(--dial) * -0.093);
+    }
+
+    .tape {
+      --node: 1.75rem;
+      font-size: 0.8125rem;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .block,
+  :global(html[data-motion="reduced"]) .node path,
+  :global(html[data-motion="reduced"]) .num,
+  :global(html[data-motion="reduced"]) .ring {
+    transition: none;
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .block,
+    :global(html:not([data-motion="full"])) .node path,
+    :global(html:not([data-motion="full"])) .num,
+    :global(html:not([data-motion="full"])) .ring {
+      transition: none;
+      animation: none;
+    }
+  }
+}

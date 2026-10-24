@@ -1,0 +1,295 @@
+/*
+ * Panel: a quiet surface for an interactive instrument (restyle v2). A solid hairline and a flat
+ * translucent fill, nothing else by default: no glow, no gradient, no hex lattice, no crosshairs.
+ * Layers, bottom to top:
+ *   edge     the hairline ring, one solid colour
+ *   fill     the surface: a flat tint, with an optional blur behind it (`glass`)
+ *   marks    corner crosshairs: opt-in with `marks`
+ *   ruler    a tick ruler along one inner edge: opt-in with `ruler`
+ *   content  the children
+ * The root carries no clip, filter or opacity, so the fill's backdrop blur always sees what is
+ * behind the page. Do not put filter, opacity < 1, clip-path or mask on an ancestor.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .panel {
+    --c: var(--chamfer-panel);
+    --cm: var(--bevel);
+    --bw: 1px;
+    --edge: var(--panel-edge);
+    --mk: 9px; /* crosshair inset */
+    --pad: 0px; /* reset, so a padding="none" panel inside a padded one is not padded */
+    position: relative;
+    display: block;
+    min-inline-size: 0;
+    isolation: isolate;
+    color: var(--text-2);
+    text-align: start;
+    scale: var(--press, 1);
+    -webkit-tap-highlight-color: transparent;
+    transition: scale var(--dur-1) var(--ease-snap);
+  }
+
+  .panel[data-size="sm"] {
+    --c: var(--chamfer-sm);
+    --cm: 3px;
+    --mk: 7px;
+  }
+
+  .panel[data-size="lg"] {
+    --c: 18px;
+    --cm: 5px;
+    --mk: 12px;
+  }
+
+  /* A tier or a status recolours the hairline (and, through the accent roles, the content). */
+  .panel:is([data-tier], [data-tone]) {
+    --edge: rgb(var(--accent-rgb) / 0.55);
+  }
+
+  .panel[data-container] {
+    container-type: inline-size;
+  }
+
+  /* ---- layers ------------------------------------------------------------------------- */
+
+  .edge,
+  .fill,
+  .marks,
+  .ruler {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+  }
+
+  .edge {
+    inset: 0;
+    z-index: 0;
+    clip-path: var(--clip-ring);
+    background: var(--edge);
+    transition: background var(--dur-2) var(--ease-out);
+  }
+
+  .fill {
+    inset: var(--bw);
+    z-index: 1;
+    clip-path: var(--clip-inner);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+  }
+
+  /* Corner crosshairs: four pluses poured through a mask. Opt-in. */
+  .marks {
+    inset: 0;
+    z-index: 6;
+    background: rgb(255 255 255 / 0.45);
+    -webkit-mask-image: var(--mask-plus), var(--mask-plus), var(--mask-plus), var(--mask-plus);
+    mask-image: var(--mask-plus), var(--mask-plus), var(--mask-plus), var(--mask-plus);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 11px 11px;
+    mask-size: 11px 11px;
+    -webkit-mask-position:
+      left var(--mk) top var(--mk),
+      right var(--mk) top var(--mk),
+      left var(--mk) bottom var(--mk),
+      right var(--mk) bottom var(--mk);
+    mask-position:
+      left var(--mk) top var(--mk),
+      right var(--mk) top var(--mk),
+      left var(--mk) bottom var(--mk),
+      right var(--mk) bottom var(--mk);
+  }
+
+  /* The tick ruler: a minor tick every 6 px, a major every 30, drawn as hard-edged lines. Opt-in. */
+  .ruler {
+    z-index: 6;
+    --tc: rgb(255 255 255 / 0.4);
+  }
+
+  .panel[data-ruler="left"] .ruler,
+  .panel[data-ruler="right"] .ruler {
+    inset-block: 18% 22%;
+    inline-size: 12px;
+    background:
+      repeating-linear-gradient(180deg, var(--tc) 0 1px, transparent 1px 6px) var(--rside, left) top / 6px
+      100% no-repeat,
+      repeating-linear-gradient(180deg, var(--tc) 0 1px, transparent 1px 30px) var(--rside, left) top / 12px
+      100% no-repeat;
+  }
+
+  .panel[data-ruler="left"] .ruler {
+    inset-inline-start: 9px;
+  }
+
+  .panel[data-ruler="right"] .ruler {
+    --rside: right;
+    inset-inline-end: 9px;
+  }
+
+  .panel[data-ruler="top"] .ruler,
+  .panel[data-ruler="bottom"] .ruler {
+    inset-inline: 22% 18%;
+    block-size: 12px;
+    background:
+      repeating-linear-gradient(90deg, var(--tc) 0 1px, transparent 1px 6px) left var(--rside, top) / 100% 6px
+      no-repeat,
+      repeating-linear-gradient(90deg, var(--tc) 0 1px, transparent 1px 30px) left var(--rside, top) / 100%
+      12px no-repeat;
+  }
+
+  .panel[data-ruler="top"] .ruler {
+    inset-block-start: 9px;
+  }
+
+  .panel[data-ruler="bottom"] .ruler {
+    --rside: bottom;
+    inset-block-end: 9px;
+  }
+
+  .content {
+    position: relative;
+    z-index: 7;
+    min-inline-size: 0;
+    padding: var(--pad, 0);
+  }
+
+  .panel[data-pad="sm"] {
+    --pad: var(--space-5);
+  }
+
+  .panel[data-pad="md"] {
+    --pad: clamp(1.25rem, 1rem + 0.9vw, 1.75rem);
+  }
+
+  .panel[data-pad="lg"] {
+    --pad: clamp(1.5rem, 1.1rem + 1.4vw, 2.5rem);
+  }
+
+  /* A ruler needs room: nudge the content off the ruled edge. */
+  .panel[data-ruler="left"] > .content {
+    padding-inline-start: calc(var(--pad, 0px) + 14px);
+  }
+
+  .panel[data-ruler="right"] > .content {
+    padding-inline-end: calc(var(--pad, 0px) + 14px);
+  }
+
+  .panel[data-clip="true"] > .content {
+    clip-path: var(--clip-outer);
+  }
+
+  /* ---- variants ----------------------------------------------------------------------- */
+
+  /* Slab: denser, no blur (long lists, stacked panels). A consumer can set --panel-fill. */
+  .panel[data-variant="slab"] .fill {
+    background: var(--panel-fill, var(--glass-bg-strong));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* Ghost: the hairline only. */
+  .panel[data-variant="ghost"] .fill {
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* ---- interaction -------------------------------------------------------------------- */
+
+  .panel[data-clickable="true"] {
+    cursor: pointer;
+  }
+
+  .panel[data-tilt="true"] {
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transform-origin: 50% 50%;
+  }
+
+  /* Keyboard focus: the hairline thickens to 2 px and turns white. */
+  .panel:is(:focus-visible, [data-force="focus"]) {
+    outline: none;
+    --bw: 2px;
+    --edge: var(--hot);
+  }
+
+  /*
+   * Hover is calm: the hairline firms up and that is all. No spotlight, no glow (DESIGN 2.1).
+   * data-hover is written by the pointer hook (mouse and pen only); data-force="hover" pins the
+   * state for the kit gallery.
+   */
+  .panel[data-interactive="true"]:is([data-hover="true"], [data-force="hover"]) {
+    --edge: rgb(255 255 255 / 0.34);
+  }
+
+  .panel[data-interactive="true"]:is([data-hover="true"], [data-force="hover"]):is([data-tier], [data-tone]) {
+    --edge: rgb(var(--accent-rgb) / 0.95);
+  }
+
+  .panel[data-interactive="true"]:is(:active, [data-force="press"]) {
+    --press: var(--press-scale);
+  }
+
+  :global(html[data-motion="reduced"]) .panel,
+  :global(html[data-motion="reduced"]) .edge {
+    transition: none;
+  }
+
+  :global(html[data-motion="reduced"]) .panel[data-tilt="true"] {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .panel,
+    :global(html:not([data-motion="full"])) .edge {
+      transition: none;
+    }
+
+    :global(html:not([data-motion="full"])) .panel[data-tilt="true"] {
+      transform: none;
+    }
+  }
+
+  /* ---- accessibility modes ---------------------------------------------------------------- */
+
+  @media (prefers-contrast: more) {
+    .panel {
+      --edge: rgb(255 255 255 / 0.75);
+    }
+
+    .marks,
+    .ruler {
+      display: none;
+    }
+
+    .fill {
+      background: var(--glass-bg-solid);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .edge {
+      background: CanvasText;
+    }
+
+    .fill {
+      background: Canvas;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+
+    .marks,
+    .ruler {
+      display: none;
+    }
+
+    .panel:is(:focus-visible, [data-force="focus"]) {
+      outline: 2px solid Highlight;
+      outline-offset: 3px;
+    }
+  }
+}

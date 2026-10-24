@@ -1,0 +1,43 @@
+/*
+ * View 3, shape: the roster beside the radar, both set directly on the page.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .shape {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.25rem, 1rem + 1.5vw, 2rem) clamp(2rem, 1rem + 3.5vw, 4.5rem);
+    min-inline-size: 0;
+  }
+
+  @media (min-width: 900px) {
+    .shape {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .roster {
+      position: sticky;
+      inset-block-start: calc(var(--nav-h, 60px) + 1.5rem);
+    }
+  }
+
+  .main {
+    display: grid;
+    gap: 1.5rem;
+    min-inline-size: 0;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+  }
+
+  .key {
+    display: block;
+    flex: none;
+    overflow: visible;
+  }
+}

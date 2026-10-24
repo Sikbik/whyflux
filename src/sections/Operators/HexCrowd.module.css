@@ -1,0 +1,17 @@
+/* A crowd of hexagons on a canvas. The canvas fills its box; the box is sized by whoever places it. */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .crowd {
+    position: relative;
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+
+  .canvas {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}

@@ -1,0 +1,49 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .plate {
+    pointer-events: none;
+    user-select: none;
+    overflow: clip;
+    opacity: var(--plate-o, 1);
+  }
+
+  .plate[data-mode="fill"] {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .plate[data-mode="flow"] {
+    position: relative;
+    inline-size: 100%;
+  }
+
+  .plate[data-blend="screen"] {
+    mix-blend-mode: screen;
+  }
+
+  .img {
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+    /* Parallax: --pc is -1..1 from useScrollProgress; --motion-scale is 0 under reduced motion. */
+    translate: 0 calc(var(--pc, 0) * var(--par, 0px) * var(--motion-scale));
+    scale: var(--plate-scale, 1);
+  }
+
+  .plate[data-fade="y"] {
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
+  }
+
+  .plate[data-fade="x"] {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  }
+
+  .plate[data-fade="all"] {
+    -webkit-mask-image: radial-gradient(ellipse 78% 78% at 50% 50%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 78% 78% at 50% 50%, #000 40%, transparent 100%);
+  }
+}

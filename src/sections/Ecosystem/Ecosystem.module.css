@@ -1,0 +1,31 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  /* The eyebrow stays on one line however narrow the screen. */
+  .head > div:first-of-type > p {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .closing {
+    display: grid;
+    justify-items: center;
+    gap: 1.5rem;
+    margin-block-start: clamp(4.5rem, 2.5rem + 7vw, 8.5rem);
+    text-align: center;
+  }
+
+  .closingLine {
+    max-inline-size: 20ch;
+    margin: 0;
+    color: var(--text-2);
+    font: 300 clamp(2rem, 1.2rem + 2.8vw, 3.75rem) / 1.08 var(--font-display);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  .closingLine b {
+    color: var(--text-1);
+    font-weight: var(--fw-bold);
+  }
+}

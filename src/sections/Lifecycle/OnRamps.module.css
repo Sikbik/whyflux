@@ -1,0 +1,168 @@
+/*
+ * Part one of chapter 03: three doors, set straight on the page. Same width, same type, same loop, same
+ * copy length; the only thing that tells them apart is what they are. A single hairline over each, no
+ * box, no capsule. Solid colour and type only.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .wrap {
+    display: grid;
+    gap: 2.25rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.75rem, 1rem + 3.4vw, 5rem);
+    align-items: stretch;
+  }
+
+  .cell {
+    display: grid;
+    min-inline-size: 0;
+  }
+
+  .door {
+    display: grid;
+    border-block-start: 1px solid var(--line-3);
+    transition: border-color var(--dur-3) var(--ease-out);
+  }
+
+  /* The chosen door is the one hairline that is lit: a solid two-pixel rule (it grows upward, nothing moves). */
+  .door[data-on] {
+    border-block-start-color: var(--accent-strong);
+    border-block-start-width: 2px;
+    margin-block-start: -1px;
+  }
+
+  .radio {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    align-content: start;
+    gap: 0.9rem;
+    padding-block: 1.5rem 0.25rem;
+    min-inline-size: 0;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .radio:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 8px;
+  }
+
+  .title,
+  .line,
+  .scene {
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+
+  .title {
+    color: var(--text-1);
+    font: 300 clamp(1.75rem, 1.05rem + 1.9vw, 2.875rem) / 1.04 var(--font-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  .title b {
+    font-weight: 700;
+  }
+
+  /* Two lines reserved, so the three doors line up whichever of them wraps. */
+  .line {
+    min-block-size: 3em;
+    color: var(--text-3);
+    font: 400 var(--fs-md) / 1.5 var(--font-sans);
+    text-wrap: pretty;
+  }
+
+  .scene {
+    display: block;
+    margin-block-start: 1.35rem;
+    min-block-size: 12.5rem;
+  }
+
+  /* With a door chosen the other two step back; they are still there, still equal in size. */
+  .door[data-dim] :is(.title, .line, .scene) {
+    opacity: 0.4;
+  }
+
+  .door[data-dim]:hover :is(.title, .line, .scene) {
+    opacity: 0.8;
+  }
+
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-start: 1rem;
+    border-block-start: 1px solid var(--line-1);
+  }
+
+  .foot p {
+    margin: 0;
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.4 var(--font-sans);
+  }
+
+  /* ---- the switcher: plain words, the chosen one underlined ------------------------------------------ */
+
+  .picker {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.1rem, 0.6rem + 1.8vw, 2.25rem);
+  }
+
+  .pick {
+    padding-block: 0.5rem;
+    border-block-end: 1px solid transparent;
+    color: var(--text-3);
+    font: 500 var(--fs-md) / 1 var(--font-display);
+    cursor: pointer;
+    transition:
+      color var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out);
+  }
+
+  .pick:hover {
+    color: var(--text-1);
+  }
+
+  .pick[data-on] {
+    color: var(--text-1);
+    border-block-end-color: var(--accent-strong);
+  }
+
+  .pick:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 4px;
+  }
+
+  .picker[data-full] {
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  /* ---- narrow: the doors stack, each as wide as the page ---------------------------------------------- */
+
+  @media (max-width: 899.98px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+
+    .line {
+      min-block-size: 0;
+    }
+
+    .scene {
+      min-block-size: 0;
+      margin-block-start: 1rem;
+    }
+  }
+}

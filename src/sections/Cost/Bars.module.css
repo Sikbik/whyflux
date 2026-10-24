@@ -1,0 +1,325 @@
+/*
+ * The bars. One row per platform, each a button: the name on the left, the bar (to scale, from zero)
+ * with its price riding the end, the multiple against Flux in plain coloured type on the right. Set
+ * directly on the page: solid colour and hairlines, no boxes, no glow. Flux is the only blue.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .chart {
+    --name: clamp(9rem, 26%, 13rem);
+    --ratio: 6.25rem;
+    --tail: 6.25rem;
+    --gap: 1.25rem;
+    --pad: 0.75rem;
+    min-inline-size: 0;
+    padding-block: 0.25rem 0.4rem;
+  }
+
+  .frame {
+    position: relative;
+  }
+
+  /* Faint dollar gridlines behind the rows; the first is the zero line. */
+  .lines {
+    position: absolute;
+    inset-block: 0;
+    inset-inline: calc(var(--pad) + var(--name) + var(--gap)) calc(var(--pad) + var(--ratio) + var(--gap) + var(--tail));
+    pointer-events: none;
+  }
+
+  .lines i {
+    position: absolute;
+    inset-block: 0;
+    inline-size: 1px;
+    background: var(--line-1);
+  }
+
+  .lines i:first-child {
+    background: var(--line-3);
+  }
+
+  .rows {
+    position: relative;
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .item {
+    display: block;
+  }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--name) minmax(0, 1fr) var(--ratio);
+    grid-template-areas: "who plot ratio";
+    align-items: center;
+    column-gap: var(--gap);
+    inline-size: 100%;
+    min-block-size: 3.75rem;
+    padding: 0.4rem var(--pad);
+    color: var(--text-2);
+    text-align: start;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background var(--dur-2) var(--ease-out);
+  }
+
+  .row:hover {
+    background: rgb(255 255 255 / 0.03);
+  }
+
+  .row[data-selected] {
+    background: rgb(var(--accent-rgb) / 0.09);
+  }
+
+  /* The chosen row: a solid 2px bar of light at its edge. */
+  .row[data-selected]::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 2px;
+    background: var(--accent);
+  }
+
+  .row:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
+
+  .who {
+    grid-area: who;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-inline-size: 0;
+  }
+
+  .name {
+    color: var(--text-1);
+    font: 600 1.0625rem / 1.15 var(--font-display);
+    letter-spacing: var(--tracking-heading);
+  }
+
+  .row[data-kind="flux"] .name {
+    font-weight: 700;
+  }
+
+  .plot {
+    grid-area: plot;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    min-inline-size: 0;
+    padding-inline-end: var(--tail);
+  }
+
+  .track {
+    position: relative;
+    inline-size: 100%;
+    block-size: 14px;
+  }
+
+  .fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 2px;
+    border-radius: 0 3px 3px 0;
+    background: var(--steel-500);
+    transition: background var(--dur-2) var(--ease-out);
+  }
+
+  .row[data-selected] .fill {
+    background: var(--steel-300);
+  }
+
+  .row[data-kind="flux"] .fill {
+    background: var(--accent-solid);
+  }
+
+  /* The reading rides the end of the bar like a meter. */
+  .reading {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 10px;
+    display: flex;
+    align-items: center;
+    color: var(--text-1);
+    font: 600 var(--fs-md) / 1 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .row[data-kind="flux"] .reading {
+    color: var(--accent-strong);
+    font-size: 1.125rem;
+  }
+
+  .price {
+    display: none;
+  }
+
+  /* "19.1× Flux": the multiple as plain coloured type. It leaves at once when a run starts (nothing
+     animates while the meter does) and slides back in, row by row, once the bars have landed. */
+  .ratio {
+    grid-area: ratio;
+    justify-self: end;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4em;
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+    white-space: nowrap;
+    opacity: 0;
+    translate: 0 5px;
+  }
+
+  .ratio b {
+    color: var(--accent-strong);
+    font: 600 1.25rem / 1 var(--font-display);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chart[data-ready] .ratio {
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      translate var(--dur-3) var(--ease-snap);
+    transition-delay: calc(var(--i, 0) * 55ms);
+  }
+
+  /* ---- the dollar axis ------------------------------------------------------------------------------ */
+
+  .axis {
+    display: grid;
+    grid-template-columns: var(--name) minmax(0, 1fr) var(--ratio);
+    column-gap: var(--gap);
+    padding-inline: var(--pad);
+    padding-block-start: 0.4rem;
+  }
+
+  .axisPlot {
+    position: relative;
+    grid-column: 2;
+    display: block;
+    block-size: 1.25rem;
+    margin-inline-end: var(--tail);
+  }
+
+  .tick {
+    position: absolute;
+    inset-block-start: 0;
+    translate: -50% 0;
+    color: var(--text-3);
+    font: 500 0.6875rem / 1 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .tick:first-of-type {
+    translate: -20% 0;
+  }
+
+  /* ---- phone: stacked rows, the bar full width under its name ---------------------------------------- */
+
+  @media (max-width: 719.98px) {
+    .chart {
+      --name: 0px;
+      --ratio: 0px;
+      --tail: 0px;
+      --gap: 0px;
+      --pad: 0.25rem;
+    }
+
+    .lines {
+      display: none;
+    }
+
+    .row {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-areas:
+        "who ratio price"
+        "plot plot plot";
+      row-gap: 0.5rem;
+      column-gap: 0.9rem;
+      min-block-size: 0;
+      padding-block: 0.85rem;
+      border-block-end: 1px solid var(--line-1);
+    }
+
+    .price {
+      grid-area: price;
+      display: block;
+      min-inline-size: 4.5rem;
+      color: var(--text-1);
+      font: 600 var(--fs-md) / 1 var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      text-align: end;
+    }
+
+    .row[data-kind="flux"] .price {
+      color: var(--accent-strong);
+    }
+
+    .reading {
+      display: none;
+    }
+
+    .plot {
+      padding-inline-end: 0;
+    }
+
+    .axisPlot {
+      grid-column: 1 / -1;
+    }
+
+    .axis {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tick:last-of-type {
+      translate: -90% 0;
+    }
+  }
+
+  .inline {
+    padding: 0.25rem var(--pad) 1.25rem;
+    animation: open var(--dur-3) var(--ease-out) both;
+  }
+
+  @keyframes open {
+    from {
+      opacity: 0;
+      translate: 0 -6px;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .ratio,
+  :global(html[data-motion="reduced"]) .row,
+  :global(html[data-motion="reduced"]) .fill {
+    transition: none;
+  }
+
+  :global(html[data-motion="reduced"]) .inline {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .ratio,
+    :global(html:not([data-motion="full"])) .row,
+    :global(html:not([data-motion="full"])) .fill {
+      transition: none;
+    }
+
+    :global(html:not([data-motion="full"])) .inline {
+      animation: none;
+    }
+  }
+}

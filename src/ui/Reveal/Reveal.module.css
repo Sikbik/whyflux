@@ -1,0 +1,39 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .reveal {
+    transition:
+      opacity var(--dur-4) var(--ease-out) var(--delay, 0ms),
+      translate var(--dur-4) var(--ease-out) var(--delay, 0ms),
+      scale var(--dur-4) var(--ease-out) var(--delay, 0ms),
+      filter var(--dur-4) var(--ease-out) var(--delay, 0ms);
+  }
+
+  .reveal[data-shown="false"] {
+    opacity: 0;
+  }
+
+  .reveal[data-shown="false"][data-from="up"] {
+    translate: 0 var(--reveal-y);
+  }
+
+  .reveal[data-shown="false"][data-from="down"] {
+    translate: 0 calc(var(--reveal-y) * -1);
+  }
+
+  .reveal[data-shown="false"][data-from="left"] {
+    translate: calc(var(--reveal-y) * -1.5) 0;
+  }
+
+  .reveal[data-shown="false"][data-from="right"] {
+    translate: calc(var(--reveal-y) * 1.5) 0;
+  }
+
+  .reveal[data-shown="false"][data-blur="true"] {
+    filter: blur(var(--reveal-blur));
+  }
+
+  .reveal[data-shown="false"][data-scale="true"] {
+    scale: 0.94;
+  }
+}

@@ -1,0 +1,14 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .marker {
+    display: inline-block;
+    flex: none;
+    overflow: visible;
+    transition: opacity var(--dur-2) var(--ease-out);
+  }
+
+  .marker[data-muted] {
+    opacity: 0.62;
+  }
+}

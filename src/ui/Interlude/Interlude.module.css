@@ -1,0 +1,69 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .interlude {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    justify-items: center;
+    gap: 1.5rem;
+    padding-block: clamp(5rem, 2.5rem + 11vw, 12rem);
+    padding-inline: var(--gutter);
+    text-align: center;
+    overflow: clip;
+  }
+
+  .kicker {
+    color: var(--text-3);
+    font: 500 var(--fs-md) / 1.3 var(--font-display);
+  }
+
+  /*
+   * The statement is sized to its longest line (--chars, set by the component) so the payoff always
+   * fits the viewport: about 0.62 em per bold character, 90 vw of room. Phones wrap instead.
+   */
+  .lines {
+    --fit: calc(90vw / (var(--chars, 12) * 0.62));
+    display: grid;
+    justify-items: center;
+    max-inline-size: none;
+    font: 300 min(clamp(2.5rem, 0.8rem + 9.2vw, 9.5rem), var(--fit)) / 0.94 var(--font-display);
+    letter-spacing: var(--tracking-mega);
+    color: var(--text-1);
+  }
+
+  .line {
+    display: block;
+    white-space: nowrap;
+    /* The drift: --pc is -1..1 as the band crosses the viewport; --dir alternates the sign. */
+    translate: calc(var(--pc, 0) * var(--dir) * 3.5vw * var(--motion-scale)) 0;
+    will-change: translate;
+  }
+
+  /* The setup: light and dim. The payoff: bold and white. Weight and colour carry it, nothing else. */
+  .quiet {
+    font-weight: var(--fw-light);
+    color: var(--text-3);
+  }
+
+  .solid {
+    font-weight: var(--fw-bold);
+    color: var(--text-1);
+  }
+
+  .caption {
+    max-inline-size: 52ch;
+  }
+
+  @media (max-width: 719.98px) {
+    .lines {
+      font-size: clamp(2.5rem, 0.8rem + 9.2vw, 9.5rem);
+    }
+
+    .line {
+      white-space: normal;
+      text-wrap: balance;
+      translate: calc(var(--pc, 0) * var(--dir) * 2vw * var(--motion-scale)) 0;
+    }
+  }
+}

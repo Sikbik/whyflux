@@ -1,0 +1,10 @@
+node_modules
+dist
+*.local
+.vite
+
+# Internal working docs (kept local)
+docs/BRIEF.md
+docs/BUILDERS.md
+docs/RESTYLE.md
+docs/ART_BRIEF.md

@@ -1,0 +1,58 @@
+/*
+ * Chapter 02. The Rosetta stone as type on the left, one stage on the right, set straight on the page:
+ * no panel, no frame. A plain caption sits over the stage and says what to watch.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
+    align-items: start;
+    gap: clamp(2rem, 1rem + 4.5vw, 5.5rem);
+    margin-block-start: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+  }
+
+  .index {
+    display: grid;
+    gap: 1.4rem;
+    min-inline-size: 0;
+  }
+
+  .stage {
+    display: grid;
+    gap: 1rem;
+    min-inline-size: 0;
+  }
+
+  .captionRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+  }
+
+  /* Two lines tall at most, so switching rows never moves the stage under it. */
+  .caption {
+    flex: 1 1 22rem;
+    max-inline-size: 40rem;
+    min-block-size: 2.8em;
+    margin: 0;
+    color: var(--text-1);
+    font: 400 var(--fs-lead) / 1.4 var(--font-sans);
+    text-wrap: balance;
+  }
+
+  .link {
+    justify-self: start;
+  }
+
+  /* Below the desktop width the stone is a row of words over the stage. */
+  @media (max-width: 1099.98px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.75rem;
+    }
+  }
+}

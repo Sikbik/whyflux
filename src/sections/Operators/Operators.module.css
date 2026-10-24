@@ -1,0 +1,112 @@
+/*
+ * Chapter 06: the people who run the network. Section-level layout only: each beat (the crowd, the
+ * tiers, the map, the block timer, the way in) has its own module. Content sits directly on the page;
+ * the only lines are single hairlines. Solid colour and crisp light: no gradients, no glow blobs, no
+ * text shadows.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .root {
+    --beat-gap: clamp(5rem, 3.2rem + 8vw, 10.5rem);
+  }
+
+  .beats {
+    display: grid;
+    gap: var(--beat-gap);
+    min-inline-size: 0;
+  }
+
+  .beat {
+    display: grid;
+    gap: clamp(1.75rem, 1.1rem + 2.4vw, 3.25rem);
+    min-inline-size: 0;
+  }
+
+  /* ---- beat heading ---------------------------------------------------------------------------- */
+
+  .beatTitle {
+    margin: 0;
+    max-inline-size: 26ch;
+    color: var(--text-1);
+    font: 300 clamp(1.875rem, 1.2rem + 2.6vw, 3.25rem) / 1.06 var(--font-display);
+    letter-spacing: -0.032em;
+    text-wrap: balance;
+  }
+
+  .beatTitle b {
+    font-weight: var(--fw-bold);
+  }
+
+  /* A heading with one line under it: the rule in plain words, for a beat whose picture needs it. */
+  .head {
+    display: grid;
+    gap: clamp(0.75rem, 0.5rem + 0.8vw, 1.25rem);
+    min-inline-size: 0;
+  }
+
+  .beatLede {
+    margin: 0;
+    max-inline-size: 52ch;
+    color: var(--text-2);
+    font: var(--type-lead);
+    text-wrap: balance;
+  }
+
+  /* ---- live ------------------------------------------------------------------------------------- */
+
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    color: var(--status-ok);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+  }
+
+  /* A hard-edged dot with one ring that opens out from it and is gone. */
+  .pulse {
+    position: relative;
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .pulse::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    animation: ring 2.6s var(--ease-out) infinite;
+  }
+
+  @keyframes ring {
+    from {
+      opacity: 0.9;
+      scale: 1;
+    }
+
+    to {
+      opacity: 0;
+      scale: 3.4;
+    }
+  }
+
+  .asOf {
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1 var(--font-sans);
+  }
+
+  :global(html[data-motion="reduced"]) .pulse::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .pulse::after {
+      animation: none;
+      opacity: 0;
+    }
+  }
+}

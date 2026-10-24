@@ -1,0 +1,201 @@
+/*
+ * The matrix on a phone: one question at a time. A strip of hexagons picks the question, a stacked
+ * list answers it. Flux is the only blue row. Solid colour and hairlines.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .phone {
+    display: grid;
+    gap: 1rem;
+    min-inline-size: 0;
+  }
+
+  .strip {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .group {
+    display: flex;
+    gap: 1px;
+  }
+
+  .hex {
+    display: grid;
+    place-items: center;
+    inline-size: 22px;
+    block-size: 36px;
+    --gl-fill: var(--accent);
+    transition: scale var(--dur-2) var(--ease-snap);
+  }
+
+  @media (pointer: coarse) {
+    .hex {
+      block-size: var(--touch-min);
+    }
+  }
+
+  .hex[data-on] {
+    scale: 1.3;
+    --gl-rim: var(--hot);
+  }
+
+  .hex:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 1px;
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.25rem;
+    padding-block: 0.25rem 0.75rem;
+    border-block-end: 1px solid var(--line-2);
+  }
+
+  .title {
+    display: grid;
+    gap: 0.3rem;
+    text-align: center;
+  }
+
+  .title h3 {
+    color: var(--text-1);
+    font: 600 1.25rem / 1.15 var(--font-display);
+    letter-spacing: var(--tracking-heading);
+    text-wrap: balance;
+  }
+
+  .title p {
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+    line-height: 1.45;
+  }
+
+  .list {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 0.75rem;
+    align-items: center;
+    inline-size: 100%;
+    padding: 0.8rem 0.25rem;
+    border-block-end: 1px solid var(--line-1);
+    text-align: start;
+    --gl-fill: var(--steel-500);
+    transition: background var(--dur-2) var(--ease-out);
+  }
+
+  /* A solid 3px bar of light at the edge of the home row, and of a row a link named. */
+  .row::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 3px;
+    background: transparent;
+  }
+
+  .row[data-kind="flux"] {
+    padding-inline: 0.75rem;
+    border-block-end-color: transparent;
+    background: rgb(var(--accent-rgb) / 0.12);
+    --gl-fill: var(--accent);
+  }
+
+  .row[data-kind="flux"]::before {
+    background: var(--accent);
+  }
+
+  .row[data-open] {
+    background: rgb(var(--accent-rgb) / 0.1);
+  }
+
+  /* A platform a link named: tinted, with a bar of steel light at its edge (above). */
+  .row[data-picked] {
+    padding-inline: 0.75rem;
+    background: rgb(var(--accent-rgb) / 0.07);
+  }
+
+  .row[data-picked]::before {
+    background: var(--steel-300);
+  }
+
+  .row:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
+
+  .name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-inline-size: 0;
+    color: var(--text-1);
+    font: 500 var(--fs-md) / 1.2 var(--font-display);
+  }
+
+  .name b {
+    font-weight: 600;
+  }
+
+  .row[data-kind="flux"] .name b {
+    font-weight: 700;
+  }
+
+  .meter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .meter b {
+    min-inline-size: 1.1ch;
+    color: var(--text-1);
+    font: 300 1.375rem / 1 var(--font-display);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .meter em {
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1 var(--font-sans);
+    font-style: normal;
+  }
+
+  .short {
+    grid-column: 1 / -1;
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+  }
+
+  .hint {
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+  }
+
+  .link {
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--accent-rgb) / 0.45);
+    text-underline-offset: 0.2em;
+  }
+}

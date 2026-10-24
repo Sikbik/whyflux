@@ -1,0 +1,22 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  /* The first button's words line up with the paragraph above (the ghost button pads its own text in). */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.25rem;
+    margin-inline-start: -12px;
+  }
+
+  /* On a phone the actions sit in two aligned columns instead of wrapping ragged. */
+  @media (max-width: 479.98px) {
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+      justify-content: start;
+      gap: 0.25rem 1.25rem;
+    }
+  }
+}

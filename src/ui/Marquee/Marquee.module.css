@@ -1,0 +1,47 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .marquee {
+    overflow: hidden;
+    inline-size: 100%;
+  }
+
+  .track {
+    display: flex;
+    inline-size: max-content;
+    animation: run var(--dur, 48s) linear infinite;
+    will-change: transform;
+  }
+
+  .marquee[data-reverse="true"] .track {
+    animation-direction: reverse;
+  }
+
+  .marquee[data-pause="true"]:is(:hover, :focus-within) .track {
+    animation-play-state: paused;
+  }
+
+  .group {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--marquee-gap, 3rem);
+    padding-inline-end: var(--marquee-gap, 3rem);
+  }
+
+  @keyframes run {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .track {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .track {
+      animation: none;
+    }
+  }
+}

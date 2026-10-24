@@ -1,0 +1,238 @@
+/*
+ * The three micro-scenes, set bare on the page: lines of type, hairline gauges and ticks, no frame, no
+ * title bar, no capsule. One number, --mp (0 to 1), drives every element as a window: each animates
+ * between its own --a and --b. In a door's column the number loops over six seconds, paused off screen;
+ * in the pinned story the scroll writes it (data-scrub), so the same picture is scrubbed. Under reduced
+ * motion a column shows its finished frame. Sizes are in em from the column's own font size, which follows
+ * its width, so the picture holds together from a phone to a narrow column.
+ */
+@property --mp {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .micro {
+    --mp: 1;
+    position: relative;
+    min-inline-size: 0;
+    container-type: inline-size;
+    animation: micro-loop 6s linear infinite paused;
+    /* Everything fades out at the end of the loop so the restart is not a jump. */
+    opacity: calc(1 - clamp(0, calc((var(--mp) - 0.94) / 0.06), 1));
+    font-family: var(--font-mono);
+    font-size: clamp(0.75rem, 3.5cqw, 0.875rem);
+    line-height: 1.2;
+    color: var(--text-2);
+  }
+
+  .micro[data-live] {
+    animation-play-state: running;
+  }
+
+  /* In the story the scroll owns the number. */
+  .micro[data-scrub] {
+    animation: none;
+    opacity: 1;
+    font-size: 0.8125rem;
+  }
+
+  @keyframes micro-loop {
+    from {
+      --mp: 0;
+    }
+    to {
+      --mp: 1;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .micro:not([data-scrub]) {
+    animation: none;
+    --mp: 0.92;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .micro:not([data-scrub]) {
+      animation: none;
+      --mp: 0.92;
+      opacity: 1;
+    }
+  }
+
+  /* One window: 0 before --a, 1 after --b. */
+  .micro :is(.val, .pip, .fill, .deploy, .idle, .done, .log, .call, .callTick) {
+    --k: clamp(0, calc((var(--mp) - var(--a, 0)) / max(0.001, calc(var(--b, 0.01) - var(--a, 0)))), 1);
+  }
+
+  .body {
+    display: grid;
+    align-content: start;
+    gap: 0.85em;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 6.2em minmax(0, 1fr);
+    align-items: center;
+    gap: 0.7em;
+    min-block-size: 1.3em;
+  }
+
+  .key {
+    color: var(--text-3);
+  }
+
+  .prompt {
+    color: var(--accent-text);
+  }
+
+  .val {
+    display: inline-block;
+    color: var(--text-1);
+    white-space: nowrap;
+  }
+
+  /* Typing, scrubbed: a wipe from the left. */
+  .wipe {
+    clip-path: inset(0 calc((1 - var(--k)) * 100%) 0 0);
+    justify-self: start;
+  }
+
+  .row:has(.prompt) {
+    grid-template-columns: 1.1em minmax(0, 1fr);
+  }
+
+  .pips {
+    display: flex;
+    gap: 0.5em;
+  }
+
+  .pip {
+    display: block;
+    inline-size: 0.95em;
+    block-size: 1.1em;
+    background: var(--accent-strong);
+    clip-path: var(--hex-clip);
+    opacity: var(--k);
+    scale: calc(0.5 + 0.5 * var(--k));
+  }
+
+  /* A gauge is a hairline with a solid stroke laid along it. */
+  .gauge {
+    position: relative;
+    display: block;
+    block-size: 2px;
+    background: var(--line-2);
+  }
+
+  .fill {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: var(--accent-strong);
+    transform-origin: left center;
+    scale: calc(var(--k) * var(--f, 0.5)) 1;
+  }
+
+  .log {
+    display: grid;
+    grid-template-columns: 1.1em minmax(0, 1fr);
+    gap: 0.6em;
+    opacity: var(--k);
+    translate: 0 calc((1 - var(--k)) * 4px);
+  }
+
+  .tickMark {
+    color: var(--status-ok);
+    display: inline-flex;
+  }
+
+  .ask {
+    justify-self: start;
+    font-family: var(--font-sans);
+    font-size: 1.15em;
+    font-style: italic;
+  }
+
+  .calls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 1.4em;
+  }
+
+  .call {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    color: var(--accent-strong);
+    opacity: var(--k);
+    translate: 0 calc((1 - var(--k)) * 4px);
+  }
+
+  .callTick {
+    display: inline-flex;
+    color: var(--status-ok);
+    opacity: var(--k);
+  }
+
+  /* Before a door is chosen: three ways in, one under another. */
+  .entries {
+    display: grid;
+    gap: 0.7em;
+  }
+
+  .entry {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    min-block-size: 1.3em;
+  }
+
+  .quote {
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 1.15em;
+    font-style: italic;
+  }
+
+  .foot {
+    display: flex;
+    align-items: center;
+    min-block-size: 1.4em;
+    margin-block-start: 0.2em;
+  }
+
+  .deploy {
+    position: relative;
+    display: inline-grid;
+    align-items: center;
+    justify-items: start;
+    opacity: calc(0.45 + 0.55 * var(--k));
+  }
+
+  .deploy > * {
+    grid-area: 1 / 1;
+  }
+
+  .idle {
+    color: var(--text-1);
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--accent-strong);
+    text-underline-offset: 0.3em;
+    opacity: calc(1 - var(--k));
+  }
+
+  .done {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    color: var(--status-ok);
+    opacity: var(--k);
+  }
+}
