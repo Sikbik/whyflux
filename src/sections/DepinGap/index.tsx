@@ -1,20 +1,22 @@
 import { Section, SectionHeader } from '@/ui';
-import { OpenMap } from './OpenMap';
+import { TwoQuestions } from './TwoQuestions';
+import styles from './TwoQuestions.module.css';
 
 /**
- * Chapter 04: open to anyone, never on one machine. The turn from the idea to the proof, in one
- * picture. Where can an app live? On two questions: who is allowed to host, and how many machines it
- * runs on. Flux is the one place where the answers are "anyone" and "several". The kinds on the map
- * are generic (no platform is named); Flux's own claims come from `src/data/flux.ts`.
+ * Chapter 04: open to anyone, on as many machines as you choose. The turn from how Flux works to the
+ * proof. Two questions decide how fragile hosting is (who is allowed to host, and how many machines
+ * run your app) and the chapter is one picture of five ways to host answering both: Flux first, then
+ * the four that each fall short on one. The kinds are generic (no platform is named) and Flux's own
+ * claims are read from `src/data/flux.ts`. The picture is whole from the first frame; see TwoQuestions.
  */
 export function DepinGap() {
   return (
     <Section id="open" label="Open to anyone, on as many machines as you choose">
       <SectionHeader
-        title="Open to anyone, *on as many machines as you choose*"
-        lede="Two questions decide how fragile a cloud is: who can host it, and how many machines run your app."
+        title="Open to *anyone,* on as many machines as *you choose*"
+        lede={<span className={styles.lede}>Two questions decide how fragile hosting is</span>}
       />
-      <OpenMap />
+      <TwoQuestions />
     </Section>
   );
 }

@@ -17,6 +17,8 @@ export default defineConfig(({ mode }) => {
       host: '127.0.0.1',
       port: Number(env.WEB_PORT || 5190),
       strictPort: true,
+      // Lets `tailscale serve` proxy the dev server to phones and laptops on the tailnet.
+      allowedHosts: ['.ts.net'],
     },
     preview: {
       host: '127.0.0.1',

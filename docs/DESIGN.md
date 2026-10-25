@@ -20,8 +20,9 @@ correction. **Where this section and anything below disagree, this section wins.
 
 **The chapter specs in section 9 are historical.** The shipped chapters diverged on purpose, and the
 code in `src/sections/<Name>/` is the source of truth. The biggest changes:
-- 04 became **Open** (`#open`, folder still `DepinGap`): "Open to anyone, never on one machine", a
-  two-axis map of generic deployment kinds with no named networks and no pull-the-plug lanes.
+- 04 became **Open** (`#open`, folder still `DepinGap`): "Open to anyone, on as many machines as you
+  choose", one picture of five generic ways to host (no named networks, no pull-the-plug lanes) answering
+  two questions, with Flux first and drawn in full from the first frame. See "The Open chapter" below.
 - 05 **Take it down** is two lanes, traditional hosting vs Flux; the marketplace-lease lane is gone.
 - 06 **Operators** has no concentration beat. "Every node gets its turn" shows the round-robin queue
   and the full turn including parallel assets (10 chains, matched in full), all from `payoutCycle`.
@@ -109,6 +110,35 @@ deleted prop.
 Tokens: new `--fs-title`, `--chamfer-panel`, `--panel-edge`. `--glow-1`, `--glow-2`, `--glow-hot`,
 `--hot-glow` and `--accent-glow` still exist but are inert (they paint nothing), so nothing that reads
 them breaks. `.t-label` (uppercase mono) is still there for the rare label that earns it.
+
+### The Open chapter (04): two questions, one answer
+
+The first Open was a two-axis map that told itself over eight seconds from a trigger at mid-screen. A
+visitor scrolling past saw an empty grid with faint labels and moved on, and the point sat in a caption.
+The rebuild (`src/sections/DepinGap/`) is the pattern to copy for any picture that makes an argument:
+
+- **The picture is the argument, in words, with nothing to decode.** Two big questions ("Who can host?",
+  "How many machines run your app?") head two columns. Five rows answer them, Flux first and set large in
+  the accent, then the four that each fall short on one question (`kinds.ts`, from the most open host to
+  the least). An answer that is the generous one is white with a filled hexagon; one that falls short is
+  set back (60 percent) with a hollow hexagon. The only row with two lit answers is Flux. The kinds stay
+  generic and the claims stay scoped inside the picture ("five ways", an illustration, not a measurement).
+- **One hexagon is one machine.** "One" is one hexagon, "Several" is three, and Flux's answer is a field of
+  exactly 100, the most one app can ask for (`features.replicas`: 1 to 100). Hexagons are decorative
+  (`aria-hidden`); every answer is also text, and each row reads aloud as its name plus both answers.
+- **The default render is the understood state.** Everything is drawn and lit in the CSS. Nothing is
+  hidden until a trigger, there is no Skip or Replay and no autoplay story. Motion only adds: each row (and
+  the two question rules) gets `data-play` once, from `usePlay` just before it scrolls into view, which
+  starts a fall-back from "every answer lit" to the drawn state: what falls short is set back in turn
+  (the first question, then the second) and Flux's field comes on a tenth at a time. It ends in under a
+  second (about 0.7 s), uses `opacity` and `transform` only, and every time is multiplied by
+  `--motion-scale`, so reduced motion (OS or the footer toggle) is the drawn state with nothing running.
+  A chapter that mounts already on screen (a deep link) starts before its first paint.
+- **Receipts stay on demand.** One quiet sentence under the picture says Flux's claims in full, built from
+  the `permissionless` and `replicas` headlines, and "Details and sources" opens what the picture is and
+  both claims with their sources.
+- **The rule it left:** nothing important waits for a trigger or a long reveal. If a visitor would scroll
+  past the chapter before the point appears, the default state is wrong.
 
 ### Checking your work
 
@@ -300,7 +330,7 @@ Montserrat (display, UI), Open Sans (body), IBM Plex Mono (labels, numbers, code
 
 | Role | Class / token | Spec | Use |
 | --- | --- | --- | --- |
-| Mega | `.t-mega`, `--type-mega` | 300, `clamp(3rem, .9rem + 9.4vw, 10.5rem)`, lh .9, tracking -.055em | The hero headline only |
+| Mega | `.t-mega`, `--type-mega` | 300, `clamp(3rem, .9rem + 9.4vw, 10.5rem)`, lh .9, tracking -.055em | Reserved for the hero; the hero headline is now sized by `Hero/current/layout.ts` in Archivo 800 instead |
 | Display | `.t-display` | 300, up to 7rem, tracking -.04em | Interlude statements, big pull lines |
 | H2 | `.t-h2`, `SectionHeader` title | 600, `clamp(2.125rem, 1.2rem + 4vw, 4.25rem)`, tracking -.03em | Chapter titles (mixed weights inside) |
 | H3, H4 | `.t-h3`, `.t-h4` | 600, 1.25 to 1.625rem; 1.0625rem | Card and panel titles |
@@ -781,13 +811,47 @@ if one goes dark. Then one clear next step.
 
 **What is built (Restyle v2).** A full-viewport stage. Layers, bottom to top: `hero-horizon` poster (first
 paint and the no-WebGL fallback), the live globe canvas (`src/lib/globe`, three.js, lazy chunk), the copy
-(H1 "Pull the plug" / "**It keeps running**" on two lines with no period, one lede, two CTAs: "Try to take it
-down" to `#takedown`, "How it works" to `#kubernetes`), the empty "window" row the planet shows through,
+(the electric H1 below, one lede, two CTAs: "Try to take it down" to `#takedown`, "How it works" to
+`#kubernetes`), the empty "window" row the planet shows through,
 and the number strip at the foot: four big light numbers (nodes online, countries, operator IDs, apps
 running) with their names beneath, on a flat translucent black backing with one hairline on top, plus a
 quiet `FreshnessChip` (a breathing dot and "Live just now") and a `Sources` text link. No eyebrow, no bokeh
-plate, no scrim, no fade into black, no capsule. Entrance: fonts-ready hold, then words rise, then the
-planet ignites outward from the north Atlantic.
+plate, no scrim, no fade into black, no capsule. Entrance: fonts-ready hold, then the headline's own
+entrance (below), with the lede and buttons arriving as it strikes, then the planet ignites outward from
+the north Atlantic.
+
+**The headline** (`Headline.tsx`, `current/`). "Pull the plug" / "It keeps running" in Archivo 800 (variable
+weight and width: the one face outside the Montserrat, Open Sans and Plex Mono system, declared in
+`Headline.font.css`), white over Flux blue (`--accent`), on two equal lines (three on a phone, set in the
+narrower width so the payoff can be bigger), with current running over it. It is a canvas (`aria-hidden`)
+over a real, visually hidden `<h1>`. The canvas draws the letters one at a time, so each can charge and
+flash, and traces their real outlines from a rasterised glyph (marching squares, no font parser) so arcs can
+run along the edges of whatever face and size the page picked. A bolt is three crisp additive strokes: a
+faint blue sheath, a pale-cyan layer and a white-hot core (a few hard pixels of halo, never a blur or a glow).
+The letters are painted last, opaque, so current runs behind the type: it can light a letter from its edges
+but never crosses a word. Bolts also stay on the canvas and clear of the fixed header (`--nav-h`) that runs
+over its top.
+- **The script** (`current/director.ts`): "Pull the plug" crackles, the plug is pulled (a flash, a bolt thrown
+  off the end of the line, the lights stutter) and both lines go dead and colourless. Then three conduits
+  converge on the middle from the top corners and the top centre and pulse harder three times, like a flux
+  capacitor charging, and strike: the payoff surges on in blue. After that: a small spark about once a second,
+  a real arc (a crawl along an outline, a leap across a gap, a zap between the lines, a hop over the tops, a
+  run along the line) every second or two, and a surge every 9 to 15 s.
+- **Interaction:** the pointer near the letters draws up to three plasma-ball filaments to it (calmer when it
+  rests); on a letter itself it lights that letter and crackles round its edge. A tap or click on the letters
+  is a surge, counted when the press ends where it began (a finger that starts a scroll is not a tap). Under
+  reduced motion it is one still frame with three held arcs and no loop.
+- **Cost and stability:** the height is reserved from arithmetic (`current/layout.ts`, with the face's
+  measurements baked into `current/face.ts`), so nothing moves when the font arrives, and if it is slow
+  enough that a fallback face is drawn first, the real one still gets the same room and is swapped in when it
+  lands. The loop runs only while the hero is near the viewport, the tab is visible and the copy has not
+  faded out on scroll; it paints only when something is lit, and between arcs it dozes on a timer until the
+  next scripted event (about a third fewer frames in steady state). A frame costs about 0.1 ms at its
+  busiest. The canvas is drawn at the screen's pixel ratio up to 3 (a phone's) within a 4.2 Mpx budget.
+- **Tuning (dev only):** `window.__current` is the live engine. `__current.setActive(false)` pauses it,
+  `__current.seek(1.4)` draws the entrance at 1.4 s (deterministic: it is seeded), `__current.advance(n)`
+  steps n frames, and `__current.debug.scene()` / `.director()` expose the state. The entrance timings are
+  in `director.ts` (`start()`, `TEMPO`), the bolt weight in `scene.ts` (`bolt`) and `paint.ts`.
 
 **The globe.** Real node positions from `useFluxLive().points` (weighted, tier-colored), hex-dot land
 from a baked Natural Earth mask, thin travelling arcs, a drag-to-spin planet with inertia, a hover label
@@ -802,7 +866,7 @@ the nodes read crisply on black.
 forces a quality tier, `?hide=atmo,dots,sites,arcs,grat,rings,pulses,bloom` hides layers for debugging.
 `createGlobe({ playable, ambientFailover })` are the two switches; the hero passes `false` and `true`.
 
-**Phone.** One column: H1, a shorter lede, two full-width buttons, then the planet in its own
+**Phone.** One column: H1 (three lines: "Pull the plug", "It keeps", "running"), a shorter lede, two full-width buttons, then the planet in its own
 window (`HeroGlobe` measures the window and passes `topPx` to the engine), then the four numbers
 (2 by 2) below the fold.
 
@@ -1039,6 +1103,9 @@ never exceeds the viewport; 390 px shows ten readable cards; reduced motion work
 ---
 
 ### 04 Decentralized is not the same as resilient (`#depin`, `src/sections/DepinGap/`)
+
+> Superseded twice. The quadrant below became a two-axis map, and the map became the Open chapter (Restyle
+> v2, "The Open chapter"). Kept for the research it cites; the code is the source of truth.
 
 **Act II.** The turn from "the idea" to "the proof": most "decentralized cloud" is a marketplace, and a
 marketplace is not a cloud.
@@ -1820,6 +1887,8 @@ None of these blocks a chapter: each chapter renders without them and says what 
 | 2026-10-24 | Chapter 03 shows Docker, Git (Orbit) and an AI agent (MCP) as three equal on-ramps | User |
 | 2026-10-24 | The hero globe is a showcase: no click to knock out, no "Simulation" tag, no instruction captions, glow turned down to an accent. The tooltip shows only location, tier and node count | User |
 | 2026-10-24 | New chapter `sealed` (07, nav "Privacy", act III) after Operators; later chapters renumbered | User |
+| 2026-10-24 | The hex-pixel hero headline is replaced by crisp Archivo display type with procedural lightning (hard to read and awkward, per the user) | User, Design |
+| 2026-10-24 | The electric headline direction is approved. Current runs behind the letters (never across a word), starts below the fixed header, and a tap counts when the press ends | User, Design |
 | 2026-10-24 | The hero keeps a quiet ambient failover loop (no controls, no claims); it is one switch (`ambientFailover`) if it should go. Where real positions are missing the globe says "Illustrative node positions" | Design |
 | 2026-10-24 | The hero's four numbers are a bar at the foot of the planet, not a panel, so the globe is visible | Design |
 | 2026-10-24 | Lora italic appears once on the page (chapter 01's closing line) | Design |

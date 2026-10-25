@@ -9,7 +9,7 @@ import { subscribeScroll } from '@/lib/scroll';
 import { ArtPlate, CountUp, FreshnessChip, LinkButton, Reveal, Sources } from '@/ui';
 import { GlobeReticle, type GlobeReticleHandle } from './GlobeHud';
 import { HeroGlobe } from './HeroGlobe';
-import { HexHeadline } from './HexHeadline';
+import { Headline } from './Headline';
 import styles from './Hero.module.css';
 
 const NO_SITES: readonly NodePoint[] = [];
@@ -110,7 +110,7 @@ export function Hero() {
       </div>
 
       <div className={styles.copy}>
-        <HexHeadline go={go} />
+        <Headline go={go} />
 
         <Reveal immediate hold={!go} delay={1250} className={styles.leadWrap}>
           <p className={cn('t-lead', styles.lead)}>
