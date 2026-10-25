@@ -1,0 +1,58 @@
+/*
+ * The node toggle: two words on one hairline, the chosen one underlined (Flux blue for ArcaneOS, steel for
+ * a legacy node). Type does the work: no pill, no fill, no sliding indicator.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .toggle {
+    display: flex;
+    gap: clamp(1.25rem, 3vw, 2.25rem);
+    border-block-end: 1px solid var(--line-2);
+  }
+
+  .opt {
+    position: relative;
+    padding: 0.75rem 0;
+    color: var(--text-3);
+    font: 600 var(--fs-md) / 1.2 var(--font-display);
+    letter-spacing: var(--tracking-heading);
+    white-space: nowrap;
+    transition: color var(--dur-2) var(--ease-out);
+  }
+
+  .opt::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: -1px;
+    block-size: 2px;
+    background: var(--accent);
+    scale: 0 1;
+    transform-origin: left center;
+    transition: scale var(--dur-3) var(--ease-out);
+  }
+
+  .opt[data-host="legacy"]::after {
+    background: var(--steel-500);
+  }
+
+  .opt:hover,
+  .opt[aria-checked="true"] {
+    color: var(--text-1);
+  }
+
+  .opt[aria-checked="true"]::after {
+    scale: 1 1;
+  }
+
+  .opt:focus-visible {
+    outline-offset: 2px;
+  }
+
+  @media (pointer: coarse) {
+    .opt {
+      min-block-size: var(--touch-min);
+    }
+  }
+}

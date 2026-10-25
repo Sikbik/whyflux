@@ -1,0 +1,441 @@
+/*
+ * Chapter 04, two questions and one answer. Five ways to host an app answer the same two questions
+ * (who can host, how many machines run your app) and Flux is the one row where both answers are the
+ * generous ones. Type, hairlines and hexagons on the page itself: no panels, no chips, flat colour
+ * only: white and grey for the others, the Flux blue for Flux.
+ *
+ * Everything is drawn and lit by default. The play state (data-play on the heads and on each row,
+ * set once as it scrolls in) only starts a short fall-back that begins from "every answer lit" and
+ * ends on the drawn state, so any frame, and reduced motion, already shows the point. Every time is
+ * multiplied by --motion-scale, which the tokens set to 0 under reduced motion.
+ *
+ * Scale. One machine is --hx wide, everywhere. The three sizes below follow the width of the picture
+ * (container queries), not the screen, so it holds anywhere the chapter is dropped.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .root {
+    container-type: inline-size;
+    min-inline-size: 0;
+  }
+
+  .inner {
+    /* phone: two columns (who, machines); the name sits on a line of its own above its answers */
+    --hx: 0.8125rem;
+    --gap: 1rem;
+    --cols: minmax(0, 0.85fr) minmax(0, 1fr);
+    --name-col: 1 / -1;
+    --who-col: 1;
+    --machines-col: 2;
+    --head: 1.0625rem;
+    --name: 1.0625rem;
+    --answer: 0.9375rem;
+    --flux-name: 2.75rem;
+    --flux-answer: 1.25rem;
+    --field: 10.5rem;
+    --pad: 1rem;
+    position: relative;
+  }
+
+  /* The lede is one short line: on a phone it breaks in the middle, not before its last two words. */
+  .lede {
+    display: block;
+    text-wrap: balance;
+  }
+
+  /* ---- the two questions --------------------------------------------------------------------------------- */
+
+  .heads {
+    display: grid;
+    grid-template-columns: var(--cols);
+    column-gap: var(--gap);
+    align-items: end;
+    padding-block-end: 0.9rem;
+    border-block-end: 1px solid var(--line-2);
+  }
+
+  .head {
+    position: relative;
+    grid-column: var(--who-col);
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-1);
+    font: 300 var(--head) / 1.2 var(--font-display);
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .head[data-q="machines"] {
+    grid-column: var(--machines-col);
+  }
+
+  .head b {
+    font-weight: 700;
+  }
+
+  /* The question being answered lights the line under it: a solid accent rule on the hairline. */
+  .head::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: calc(-0.9rem - 1px);
+    block-size: 2px;
+    background: var(--accent);
+    transform-origin: left;
+  }
+
+  /* ---- the ways to host ---------------------------------------------------------------------------------- */
+
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: var(--cols);
+    column-gap: var(--gap);
+    row-gap: 0.55rem;
+    align-items: center;
+    padding-block: var(--pad);
+    min-inline-size: 0;
+  }
+
+  .row + .row {
+    border-block-start: 1px solid var(--line-1);
+  }
+
+  .name {
+    grid-column: var(--name-col);
+    max-inline-size: none;
+    margin: 0;
+    color: var(--text-2);
+    font: 500 var(--name) / 1.2 var(--font-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  .cell {
+    --mark: var(--text-1);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    grid-column: var(--who-col);
+    min-inline-size: 0;
+  }
+
+  .cell[data-q="machines"] {
+    grid-column: var(--machines-col);
+  }
+
+  /* An answer that falls short: set back, and its hexagon is hollow. */
+  .cell:not([data-good]) {
+    --mark: var(--text-3);
+  }
+
+  .answer {
+    max-inline-size: none;
+    color: var(--text-1);
+    font: 500 var(--answer) / 1.25 var(--font-display);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .cell:not([data-good]) .answer {
+    opacity: 0.6;
+  }
+
+  /* ---- Flux: the first row, and the answer --------------------------------------------------------------- */
+
+  .row[data-flux] {
+    --mark: var(--accent);
+    padding-block: calc(var(--pad) * 1.5) calc(var(--pad) * 2);
+    border-block-end: 1px solid var(--line-2);
+  }
+
+  .row[data-flux] .cell {
+    --mark: var(--accent);
+    align-self: start;
+  }
+
+  .row[data-flux] .name {
+    color: var(--accent-text);
+    font-weight: 700;
+    font-size: var(--flux-name);
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .row[data-flux] .answer {
+    font-weight: 600;
+    font-size: var(--flux-answer);
+  }
+
+  /* On a phone the field has no room beside its words: the answer sits level with "Anyone", the field under it. */
+  .row[data-flux] .cell[data-q="machines"] {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  /* ---- the machines -------------------------------------------------------------------------------------- */
+
+  .strip {
+    display: inline-flex;
+    flex: none;
+    gap: calc(var(--hx) * 0.22);
+  }
+
+  .hex {
+    display: block;
+    flex: none;
+    inline-size: var(--hx);
+    aspect-ratio: 24 / 28;
+    color: var(--mark);
+    overflow: visible;
+  }
+
+  /* The bullet before "who": the same machine, a little smaller. */
+  .bullet {
+    inline-size: calc(var(--hx) * 0.78);
+  }
+
+  .row[data-flux] .bullet {
+    inline-size: calc(var(--hx) * 1.1);
+  }
+
+  /* A ring that is always drawn, and a fill that is there when the answer is the generous one. */
+  .hexRing {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4px;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .hexFill {
+    fill: currentColor;
+    opacity: 0;
+  }
+
+  .hex[data-lit] .hexFill {
+    opacity: 1;
+  }
+
+  .field {
+    display: block;
+    flex: none;
+    inline-size: min(var(--field), 100%);
+    block-size: auto;
+    aspect-ratio: 22.52 / 12.5;
+    color: var(--accent);
+    overflow: visible;
+  }
+
+  .fieldRing {
+    fill: none;
+    stroke: currentColor;
+    stroke-opacity: 0.42;
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .fieldFill {
+    fill: currentColor;
+  }
+
+  /* ---- the line under the picture, and the receipts ----------------------------------------------------- */
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.25rem 2.5rem;
+    margin-block-start: clamp(1.25rem, 0.8rem + 1.8vw, 2.25rem);
+  }
+
+  .scope {
+    flex: 1 1 26rem;
+    max-inline-size: 40rem;
+    margin: 0;
+    color: var(--text-3);
+    font: 400 var(--fs-md) / 1.55 var(--font-sans);
+    text-wrap: pretty;
+  }
+
+  .details {
+    flex: none;
+    gap: 0.4rem;
+    min-block-size: var(--touch-min);
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-sans);
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .details:hover,
+  .details[aria-expanded="true"] {
+    color: var(--text-1);
+  }
+
+  .details:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 3px;
+  }
+
+  .panel {
+    max-inline-size: min(28rem, calc(100vw - 1rem));
+  }
+
+  .note {
+    max-inline-size: none;
+    margin: 0 0 1.1rem;
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.55 var(--font-sans);
+  }
+
+  .fact + .fact {
+    margin-block-start: 1.3rem;
+    padding-block-start: 1.1rem;
+    border-block-start: 1px solid var(--line-1);
+  }
+
+  .factTitle {
+    margin: 0 0 0.45rem;
+    color: var(--text-1);
+    font: 600 var(--fs-md) / 1.3 var(--font-display);
+  }
+
+  .factBody {
+    max-inline-size: none;
+    margin: 0 0 0.85rem;
+    color: var(--text-2);
+    font: 400 var(--fs-sm) / 1.6 var(--font-sans);
+  }
+
+  .sources {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sources a {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--accent-rgb) / 0.4);
+    text-underline-offset: 0.2em;
+    overflow-wrap: anywhere;
+  }
+
+  .sources a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .accessed {
+    display: block;
+    color: var(--text-3);
+    font: 400 var(--fs-xs) / 1.4 var(--font-mono);
+  }
+
+  /* ---- the fall-back: starts from every answer lit and ends on the drawn state ---------------------------- */
+
+  @keyframes fall {
+    from {
+      opacity: 1;
+    }
+  }
+
+  /* The field never starts empty: a machine that has not come on yet is already there, dimmed. */
+  @keyframes kindle {
+    from {
+      opacity: 0.22;
+    }
+  }
+
+  @keyframes draw {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  .heads[data-play] .head::after {
+    animation: draw calc(480ms * var(--motion-scale)) var(--ease-out) calc(var(--at, 0ms) * var(--motion-scale)) both;
+  }
+
+  /* The first question is asked, then the second: what falls short on each is set back in turn. */
+  .row[data-play] .cell[data-q="who"]:not([data-good]) :is(.answer, .hexFill) {
+    animation: fall calc(380ms * var(--motion-scale)) var(--ease-out) 0ms both;
+  }
+
+  .row[data-play] .cell[data-q="machines"]:not([data-good]) :is(.answer, .hexFill) {
+    animation: fall calc(380ms * var(--motion-scale)) var(--ease-out) calc(220ms * var(--motion-scale)) both;
+  }
+
+  /* Flux's machines come on, a tenth of them at a time. */
+  .row[data-play] .fieldFill {
+    animation: kindle calc(360ms * var(--motion-scale)) var(--ease-out) calc(var(--w) * 40ms * var(--motion-scale)) both;
+  }
+
+  /* ---- wider: the name moves to its own column, and everything steps up a size ---------------------------- */
+
+  @container (min-width: 36rem) {
+    .inner {
+      --hx: 1rem;
+      --gap: 1.5rem;
+      --cols: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1.5fr);
+      --name-col: 1;
+      --who-col: 2;
+      --machines-col: 3;
+      --head: 1.25rem;
+      --name: 1.25rem;
+      --answer: 1.0625rem;
+      --flux-name: 3.75rem;
+      --flux-answer: 1.5rem;
+      --field: 12rem;
+      --pad: 1.15rem;
+    }
+
+    .row[data-flux] .cell {
+      align-self: center;
+    }
+  }
+
+  /* From here the Flux column is wide enough to set the field beside its words. */
+  @container (min-width: 58rem) {
+    .inner {
+      --hx: 1.125rem;
+      --head: 1.5rem;
+      --name: 1.375rem;
+      --answer: 1.1875rem;
+      --flux-name: 4.5rem;
+      --flux-answer: 1.75rem;
+      --field: 14rem;
+      --pad: 1.3rem;
+    }
+
+    .row[data-flux] .cell[data-q="machines"] {
+      flex-direction: row;
+      align-items: center;
+      gap: 1.5rem;
+    }
+  }
+
+  @container (min-width: 70rem) {
+    .inner {
+      --hx: 1.375rem;
+      --gap: 2rem;
+      --cols: minmax(0, 1.15fr) minmax(0, 0.85fr) minmax(0, 1.6fr);
+      --head: 1.875rem;
+      --name: 1.5rem;
+      --answer: 1.3125rem;
+      --flux-name: 5.25rem;
+      --flux-answer: 1.9375rem;
+      --field: 19rem;
+      --pad: 1.5rem;
+    }
+  }
+}

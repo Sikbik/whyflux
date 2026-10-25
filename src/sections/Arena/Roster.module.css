@@ -1,0 +1,146 @@
+/*
+ * The roster: opponents as plain names. A column on a desktop (it sticks while the matchup scrolls),
+ * one scrolling line on smaller screens. The chosen name is white and bold with a solid line leading it.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .roster {
+    display: grid;
+    align-content: start;
+    min-inline-size: 0;
+  }
+
+  .group {
+    display: grid;
+  }
+
+  .group + .group {
+    margin-block-start: 0.85rem;
+    padding-block-start: 0.85rem;
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-block-size: 2.15rem;
+    padding-block: 0.2rem;
+    color: var(--text-3);
+    font: 500 var(--fs-md) / 1.2 var(--font-display);
+    text-align: start;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  @media (pointer: coarse) {
+    .item {
+      min-block-size: var(--touch-min);
+    }
+  }
+
+  /* The line that leads the chosen name grows out of nothing. */
+  .line {
+    flex: none;
+    inline-size: 0;
+    block-size: 2px;
+    background: var(--accent);
+    transition: inline-size var(--dur-3) var(--ease-out);
+  }
+
+  .item[data-on] .line {
+    inline-size: 1.25rem;
+  }
+
+  /* On the shape view a picked name carries its own line key, so the plain line would say it twice. */
+  .roster[data-mode="multi"] .line {
+    display: none;
+  }
+
+  .item:hover {
+    color: var(--text-1);
+  }
+
+  .item[data-on] {
+    color: var(--text-1);
+    font-weight: 700;
+  }
+
+  .item:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+
+  .pinned {
+    cursor: default;
+  }
+
+  .name {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+
+  /* ---- a scrolling line below 900 px: the cut-off name at the edge is the hint that there is more ---- */
+
+  @media (max-width: 899.98px) {
+    .roster {
+      display: flex;
+      align-items: center;
+      margin-inline: calc(-1 * var(--gutter));
+      padding-inline: var(--gutter);
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-snap-type: x proximity;
+      overscroll-behavior-x: contain;
+    }
+
+    .roster::-webkit-scrollbar {
+      display: none;
+    }
+
+    .group {
+      display: flex;
+      flex: none;
+    }
+
+    .group + .group {
+      margin: 0 0 0 0.75rem;
+      padding: 0 0 0 1.25rem;
+      border-block-start: 0;
+      border-inline-start: 1px solid var(--line-2);
+    }
+
+    .item {
+      flex: none;
+      padding-inline: 0.8rem;
+      border-block-end: 2px solid transparent;
+      white-space: nowrap;
+      scroll-snap-align: center;
+    }
+
+    .item[data-on] {
+      border-block-end-color: var(--accent);
+    }
+
+    /* The shape view's picks wear their line key; an underline too would say it twice. */
+    .roster[data-mode="multi"] .item[data-on] {
+      border-block-end-color: transparent;
+    }
+
+    .line {
+      display: none;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .line {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .line {
+      transition: none;
+    }
+  }
+}

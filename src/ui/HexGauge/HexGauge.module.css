@@ -1,0 +1,66 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .gauge {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .dial {
+    position: relative;
+    inline-size: 100%;
+  }
+
+  .svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  .track {
+    fill: rgb(var(--ink-0-rgb) / 0.6);
+    stroke: var(--line-2);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .fill {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    transition: stroke-dasharray var(--dur-5) var(--ease-out);
+  }
+
+  .center {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--text-1);
+    font: 500 1.35rem / 1 var(--font-display);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  .label {
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.3 var(--font-sans);
+    text-align: center;
+  }
+
+  :global(html[data-motion="reduced"]) .fill {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .fill {
+      transition: none;
+    }
+  }
+}

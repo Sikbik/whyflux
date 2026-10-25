@@ -1,0 +1,72 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .figure {
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    min-inline-size: 0;
+  }
+
+  /* Bare by default: a contained, positioned region and nothing else. */
+  .stage {
+    position: relative;
+    isolation: isolate;
+    min-inline-size: 0;
+  }
+
+  .figure[data-frame="true"] .stage {
+    border: 1px solid var(--line-2);
+  }
+
+  /* Opt-in dimension rulers: hard-edged ticks along the left and bottom. */
+  .figure[data-rulers="true"] .stage::before,
+  .figure[data-rulers="true"] .stage::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    --tc: rgb(var(--accent-rgb) / 0.45);
+  }
+
+  .figure[data-rulers="true"] .stage::before {
+    inset-block: 14% 14%;
+    inset-inline-start: 6px;
+    inline-size: 9px;
+    background:
+      repeating-linear-gradient(180deg, var(--tc) 0 1px, transparent 1px 30px) left top / 9px 100% no-repeat,
+      repeating-linear-gradient(180deg, var(--tc) 0 1px, transparent 1px 6px) left top / 5px 100% no-repeat;
+  }
+
+  .figure[data-rulers="true"] .stage::after {
+    inset-inline: 14% 14%;
+    inset-block-end: 6px;
+    block-size: 9px;
+    background:
+      repeating-linear-gradient(90deg, var(--tc) 0 1px, transparent 1px 30px) left bottom / 100% 9px no-repeat,
+      repeating-linear-gradient(90deg, var(--tc) 0 1px, transparent 1px 6px) left bottom / 100% 5px no-repeat;
+  }
+
+  /* The quiet row: a legend or a sources link, and at most one plain sentence. */
+  .caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / var(--lh-normal) var(--font-sans);
+  }
+
+  .note {
+    max-inline-size: 60ch;
+  }
+
+  .aside {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    margin-inline-start: auto;
+  }
+}

@@ -1,0 +1,94 @@
+@layer reset, tokens, base, ui, section, utility;
+
+/*
+ * The section slate (restyle v2): type does the work. A light base weight with the payoff words in
+ * bold, set large; the lede is a small second voice. On a wide container the two share a row, the
+ * lede hanging off the title's last baseline; below that the lede simply wraps under the title. No
+ * container or media query: the flex line wraps by itself, so a header dropped into a narrow column
+ * stacks too.
+ */
+@layer ui {
+  .header {
+    position: relative;
+    display: grid;
+    gap: clamp(1rem, 0.6rem + 1.2vw, 1.75rem);
+    margin-block-end: var(--section-gap);
+  }
+
+  .header[data-align="center"] {
+    max-inline-size: 60rem;
+    margin-inline: auto;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .kicker {
+    margin: 0;
+  }
+
+  .main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    align-items: last baseline;
+    gap: clamp(1.25rem, 0.8rem + 1.6vw, 2rem) clamp(2rem, 1rem + 4vw, 5rem);
+    min-inline-size: 0;
+  }
+
+  .header[data-align="center"] .main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* A long title needs the width: it keeps two lines and the lede stacks under it. */
+  .header[data-stack="true"][data-align="start"] .main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header[data-stack="true"][data-align="start"] .title {
+    flex: none;
+  }
+
+  .header[data-stack="true"][data-align="start"] .lede {
+    flex: none;
+  }
+
+  .title {
+    flex: 1 1 44rem;
+    min-inline-size: 0;
+    max-inline-size: 20ch;
+    margin: 0;
+    font: 300 var(--fs-title) / 1 var(--font-display);
+    letter-spacing: -0.045em;
+    color: var(--text-1);
+    text-wrap: balance;
+  }
+
+  .header[data-align="center"] .title {
+    flex: none;
+    max-inline-size: 22ch;
+  }
+
+  .lede {
+    flex: 1 1 20rem;
+    max-inline-size: 36rem;
+    min-inline-size: 0;
+  }
+
+  .header[data-align="center"] .lede {
+    flex: none;
+    max-inline-size: 38rem;
+  }
+
+  .lede p {
+    max-inline-size: none;
+    color: var(--text-2);
+    font: 400 var(--fs-lead) / var(--lh-body) var(--font-sans);
+    text-wrap: pretty;
+  }
+
+  .extra {
+    margin-block-start: 0.25rem;
+  }
+}

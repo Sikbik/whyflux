@@ -1,0 +1,37 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .split {
+    display: block;
+  }
+
+  .word {
+    display: inline-block;
+    /* A little room so descenders and the blur are not clipped by line boxes. */
+    padding-block: 0.06em;
+    margin-block: -0.06em;
+  }
+
+  .inner {
+    display: inline-block;
+    transition:
+      opacity var(--dur-4) var(--ease-out) calc(var(--delay, 0ms) + var(--i, 0) * var(--stagger, 55ms)),
+      translate var(--dur-4) var(--ease-out) calc(var(--delay, 0ms) + var(--i, 0) * var(--stagger, 55ms)),
+      filter var(--dur-4) var(--ease-out) calc(var(--delay, 0ms) + var(--i, 0) * var(--stagger, 55ms));
+  }
+
+  .inner[data-kind="bold"],
+  .inner[data-kind="emph"] {
+    font-weight: var(--fw-bold);
+  }
+
+  .inner[data-kind="emph"] {
+    color: var(--accent-strong);
+  }
+
+  .split[data-shown="false"] .inner {
+    opacity: 0;
+    translate: 0 0.55em;
+    filter: blur(var(--reveal-blur));
+  }
+}

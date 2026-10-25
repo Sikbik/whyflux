@@ -1,0 +1,422 @@
+/*
+ * The orbit stage. Layers: the rings (static SVG), the beam (its own SVG, so the rings never repaint),
+ * the core (the Flux symbol on a pedestal) and the nodes. Nodes are zero-size anchors that the frame
+ * loop moves with `translate`; inside, a hexagon stands over a small footprint that sits exactly on the
+ * ring. Solid strokes, flat fills and hard edges only: no glow, no blur, no gradient.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .stage {
+    --hex-w: 54px;
+    --hex-h: 62px;
+    --stem-h: 14px;
+    --foot-w: 30px;
+    --foot-h: 10px;
+    position: relative;
+    isolation: isolate;
+    container-type: inline-size;
+    aspect-ratio: 1240 / 640;
+    min-block-size: 340px;
+    overflow: clip;
+  }
+
+  @media (max-width: 719.98px) {
+    .stage {
+      aspect-ratio: 358 / 372;
+      min-block-size: 0;
+    }
+  }
+
+  /* ---- rings: the far half of each ring is quiet, the near half is bright, which is the whole 3D ---- */
+
+  .rings,
+  .beamLayer {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .beamLayer {
+    z-index: 1;
+  }
+
+  .ringBack,
+  .ringFront {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition:
+      stroke var(--dur-3) var(--ease-out),
+      stroke-opacity var(--dur-3) var(--ease-out);
+  }
+
+  .ringBack {
+    stroke-opacity: 0.16;
+  }
+
+  .ringFront {
+    stroke-opacity: 0.46;
+  }
+
+  .stage[data-ready="true"] :is(.ringBack, .ringFront) {
+    animation: ring-draw 1.5s var(--ease-cinema) both;
+    animation-delay: calc(var(--ri, 0) * 130ms);
+  }
+
+  @keyframes ring-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* The ring of the product you point at or have chosen lights up, in a crisper line. */
+  .ring[data-lift="true"] .ringBack {
+    stroke: var(--accent-strong);
+    stroke-opacity: 0.55;
+  }
+
+  .ring[data-lift="true"] .ringFront {
+    stroke: var(--accent-strong);
+    stroke-opacity: 1;
+    stroke-width: 1.5;
+  }
+
+  /* ---- the beam: symbol to the chosen product ---------------------------------------------------- */
+
+  .beam {
+    stroke: var(--accent-strong);
+    stroke-width: 1.25;
+    stroke-linecap: round;
+    opacity: 0.85;
+  }
+
+  .beamHead {
+    fill: var(--hot);
+  }
+
+  /* ---- the core ------------------------------------------------------------------------------------ */
+
+  .core {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: 0;
+    block-size: 0;
+    pointer-events: none;
+  }
+
+  .coreRim,
+  .coreStem,
+  .coreSymbol {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+  }
+
+  /* A flat plinth: a tinted disc with a crisp edge and one hard outer band (zero blur, so it is a line, not a glow). */
+  .coreRim {
+    inline-size: 128px;
+    block-size: 44px;
+    translate: -50% -50%;
+    border: 1px solid rgb(var(--accent-rgb) / 0.75);
+    border-radius: 50%;
+    background: rgb(var(--accent-rgb) / 0.12);
+    box-shadow:
+      0 0 0 9px rgb(var(--accent-rgb) / 0.06),
+      0 0 0 10px rgb(var(--accent-rgb) / 0.26);
+  }
+
+  .coreStem {
+    inline-size: 1px;
+    block-size: 24px;
+    translate: -50% -100%;
+    background: rgb(var(--accent-rgb) / 0.75);
+  }
+
+  .coreSymbol {
+    inline-size: 78px;
+    block-size: 78px;
+    max-inline-size: none;
+    translate: -50% calc(-100% - 22px);
+  }
+
+  /* ---- nodes ----------------------------------------------------------------------------------------- */
+
+  .anchor {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: 0;
+    block-size: 0;
+    opacity: 0;
+    will-change: translate, scale, opacity;
+  }
+
+  .node {
+    position: absolute;
+    inset-inline-start: -64px;
+    inset-block-start: calc(-1 * (var(--hex-h) + var(--stem-h) + var(--foot-h) / 2));
+    inline-size: 128px;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    padding: 0;
+    color: var(--text-2);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* The reticle (below) is the focus ring, so a 128 px wide outline would only be noise. */
+  .node:focus-visible {
+    outline: none;
+  }
+
+  .hex {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: var(--hex-w);
+    block-size: var(--hex-h);
+    transition: translate var(--dur-2) var(--ease-out);
+  }
+
+  .node:is(:hover, [data-hover="true"]) .hex {
+    translate: 0 -3px;
+  }
+
+  .hexSvg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  .hexBody {
+    fill: var(--ink-0);
+    stroke: var(--accent);
+    stroke-opacity: 0.9;
+    stroke-width: 1.25;
+    stroke-linejoin: round;
+    transition:
+      stroke var(--dur-2) var(--ease-out),
+      stroke-opacity var(--dur-2) var(--ease-out),
+      fill var(--dur-2) var(--ease-out);
+  }
+
+  .hexInner {
+    fill: none;
+    stroke: var(--accent);
+    stroke-opacity: 0.22;
+    stroke-width: 1;
+    stroke-linejoin: round;
+  }
+
+  .icon {
+    position: relative;
+    inline-size: calc(var(--hex-w) * 0.4);
+    block-size: auto;
+    color: var(--accent-strong);
+    transition: color var(--dur-2) var(--ease-out);
+  }
+
+  /* Planned: a dashed, empty hexagon. Never mistaken for something you can use today. */
+  .node[data-status="announced"] .hexBody {
+    stroke-opacity: 0.7;
+    stroke-dasharray: 3.5 3;
+  }
+
+  .node[data-status="announced"] .hexInner {
+    display: none;
+  }
+
+  .node[data-status="announced"] .icon {
+    opacity: 0.6;
+  }
+
+  .node[data-status="deprecated"] {
+    --accent-rgb: 165 173 189;
+    --accent-strong: var(--text-3);
+  }
+
+  .node:is(:hover, [data-hover="true"]) .hexBody {
+    fill: var(--accent-900);
+    stroke: var(--accent-strong);
+    stroke-opacity: 1;
+  }
+
+  .node[data-selected="true"] .hexBody {
+    fill: var(--accent-800);
+    stroke: var(--hot);
+    stroke-opacity: 1;
+    stroke-width: 1.5;
+  }
+
+  .node[data-selected="true"] .icon {
+    color: var(--hot);
+  }
+
+  .reticle {
+    position: absolute;
+    inset-block-start: -8px;
+    inset-inline-start: -8px;
+    inline-size: calc(var(--hex-w) + 16px);
+    block-size: calc(var(--hex-h) + 17px);
+    fill: none;
+    stroke: var(--hot);
+    stroke-width: 1.25;
+    opacity: 0;
+    scale: 1.25;
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      scale var(--dur-3) var(--ease-out);
+  }
+
+  .node[data-selected="true"] .reticle,
+  .node:focus-visible .reticle {
+    opacity: 1;
+    scale: 1;
+  }
+
+  .stem {
+    inline-size: 1px;
+    block-size: var(--stem-h);
+    background: rgb(var(--accent-rgb) / 0.55);
+  }
+
+  .foot {
+    position: relative;
+    inline-size: var(--foot-w);
+    block-size: var(--foot-h);
+    border: 1px solid rgb(var(--accent-rgb) / 0.85);
+    border-radius: 50%;
+    background: rgb(var(--accent-rgb) / 0.18);
+  }
+
+  .node[data-status="announced"] .foot {
+    border-style: dashed;
+    background: transparent;
+  }
+
+  .node[data-selected="true"] .foot {
+    border-color: var(--hot);
+    background: rgb(var(--accent-hot-rgb) / 0.3);
+  }
+
+  /* Pointing at a node sends one ring out of its footprint. The animation restarts on every new hover. */
+  .pulse {
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--accent-strong);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .node:is(:hover, [data-hover="true"]) .pulse {
+    animation: foot-pulse 1.4s var(--ease-out) both;
+  }
+
+  @keyframes foot-pulse {
+    from {
+      opacity: 0.9;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 3.4 2;
+    }
+  }
+
+  /* The name sits on a solid backing, so a ring passing behind it breaks cleanly instead of running through the letters. */
+  .label {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    margin-block-start: 7px;
+    padding: 2px 7px 3px;
+    border-radius: 2px;
+    background: var(--void);
+    color: var(--text-2);
+    font: 500 0.875rem / 1.15 var(--font-display);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    transition: color var(--dur-2) var(--ease-out);
+  }
+
+  .label em {
+    color: var(--text-3);
+    font: 500 0.75rem / 1 var(--font-sans);
+    font-style: normal;
+    letter-spacing: 0.02em;
+  }
+
+  .node:is(:hover, [data-hover="true"], [data-selected="true"]) .label {
+    color: var(--text-1);
+  }
+
+  /* On narrow stages the names would collide: only the node you point at or choose is named. */
+  @container (max-width: 780px) {
+    .label {
+      opacity: 0;
+      transition: opacity var(--dur-2) var(--ease-out);
+    }
+
+    .node:is(:hover, [data-hover="true"], [data-selected="true"]) .label {
+      opacity: 1;
+    }
+  }
+
+  /* A phone: smaller nodes (real sizes, so the stems stay short) and no names at all, because the caption below
+     already names the one you chose. */
+  @container (max-width: 560px) {
+    .anchor {
+      --hex-w: 40px;
+      --hex-h: 46px;
+      --stem-h: 10px;
+      --foot-w: 24px;
+      --foot-h: 8px;
+    }
+
+    .node {
+      inline-size: 80px;
+      inset-inline-start: -40px;
+    }
+
+    .label {
+      display: none;
+    }
+
+    .core {
+      scale: 0.66;
+    }
+  }
+
+  /* ---- reduced motion ---------------------------------------------------------------------------------- */
+
+  :global(html[data-motion="reduced"]) :is(.ringBack, .ringFront) {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  :global(html[data-motion="reduced"]) .node:is(:hover, [data-hover="true"]) .pulse {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) :is(.ringBack, .ringFront) {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+
+    :global(html:not([data-motion="full"])) .node:is(:hover, [data-hover="true"]) .pulse {
+      animation: none;
+    }
+  }
+}

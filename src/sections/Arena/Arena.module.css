@@ -1,0 +1,22 @@
+/*
+ * Chapter 08 layout: a switch of three words over one stage. Everything else lives in the views, set
+ * directly on the page: solid colour and hairlines, no panels.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .bar {
+    margin-block-end: clamp(2rem, 1.4rem + 2.4vw, 3.5rem);
+    scroll-margin-block-start: calc(var(--nav-h, 60px) + 1rem);
+  }
+
+  .stage {
+    min-block-size: 40rem;
+  }
+
+  @media (max-width: 719.98px) {
+    .stage {
+      min-block-size: 0;
+    }
+  }
+}

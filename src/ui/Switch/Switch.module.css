@@ -1,0 +1,94 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75em;
+    min-block-size: var(--touch-min);
+    color: var(--text-2);
+    font: 500 var(--fs-sm) / 1.2 var(--font-display);
+    text-align: start;
+  }
+
+  .track {
+    --h: 24px;
+    position: relative;
+    flex: none;
+    inline-size: 46px;
+    block-size: var(--h);
+    border: 1px solid var(--line-3);
+    border-radius: var(--r-pill);
+    background: rgb(var(--ink-1-rgb) / 0.9);
+    transition:
+      background var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out),
+      box-shadow var(--dur-2) var(--ease-out);
+  }
+
+  .knob {
+    position: absolute;
+    inset-block: 3px;
+    inset-inline-start: 3px;
+    inline-size: 16px;
+    background: var(--text-3);
+    clip-path: var(--hex-clip);
+    transition:
+      translate var(--dur-3) var(--ease-snap),
+      background var(--dur-2) var(--ease-out);
+  }
+
+  .switch[aria-checked="true"] .track {
+    border-color: rgb(var(--accent-hot-rgb) / 0.7);
+    background: rgb(var(--accent-rgb) / 0.3);
+  }
+
+  .switch[data-tone="crit"][aria-checked="true"] .track {
+    --accent-rgb: var(--status-crit-rgb);
+    --accent-hot-rgb: 255 163 178;
+    --accent-deep-rgb: 232 51 79;
+  }
+
+  .switch[data-tone="ok"][aria-checked="true"] .track {
+    --accent-rgb: var(--status-ok-rgb);
+    --accent-hot-rgb: 156 240 197;
+    --accent-deep-rgb: 43 184 119;
+  }
+
+  .switch[data-tone="warn"][aria-checked="true"] .track {
+    --accent-rgb: var(--status-warn-rgb);
+    --accent-hot-rgb: 255 197 146;
+    --accent-deep-rgb: 224 123 28;
+  }
+
+  .switch[aria-checked="true"] .knob {
+    translate: 22px 0;
+    background: #fff;
+  }
+
+  .switch:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .switch:focus-visible {
+    outline: none;
+  }
+
+  .switch:focus-visible .track {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 3px;
+  }
+
+  :global(html[data-motion="reduced"]) .knob,
+  :global(html[data-motion="reduced"]) .track {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .knob,
+    :global(html:not([data-motion="full"])) .track {
+      transition: none;
+    }
+  }
+}

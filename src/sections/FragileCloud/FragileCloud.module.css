@@ -1,0 +1,51 @@
+/*
+ * Chapter 01, the cold. The opener is the headline over the art plate (three monoliths, one cracked:
+ * three companies, one bad day). The plate belongs to the opener alone and ends where the stage
+ * begins: the stage is a solid band, so it covers the plate's lower edge. Where the plate meets the
+ * interlude above, its top edge is faded into the black over a few rem: the one sanctioned gradient
+ * (an art plate dissolving into black for legibility), kept short so the monoliths' tips and the red
+ * beacon above them stay lit. Everything else is solid colour and hairlines: no gradients, no glow.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .root {
+    --plate-h: clamp(30rem, 84svh, 56rem);
+  }
+
+  .plate {
+    inset: 0 0 auto 0;
+    block-size: var(--plate-h);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 clamp(1.75rem, 3vw, 2.5rem));
+    mask-image: linear-gradient(180deg, transparent 0, #000 clamp(1.75rem, 3vw, 2.5rem));
+  }
+
+  .opener {
+    display: flex;
+    align-items: flex-end;
+    min-block-size: var(--plate-h);
+    padding-block: calc(var(--section-y) * 0.8) clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .opener > :global(.container) {
+    inline-size: 100%;
+  }
+
+  /* The lede sits under the title, on the dark side of the plate. */
+  .lede {
+    max-inline-size: 31rem;
+    margin-block-start: clamp(1.25rem, 0.8rem + 1.6vw, 2rem);
+    color: var(--text-2);
+  }
+
+  @media (max-width: 719.98px) {
+    .opener {
+      padding-block-start: 6.5rem;
+    }
+
+    /* The monoliths sit behind the type on a phone: quieter. */
+    .plate {
+      opacity: 0.5;
+    }
+  }
+}

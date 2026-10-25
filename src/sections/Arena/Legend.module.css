@@ -1,0 +1,43 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 2.25rem;
+    --gl-fill: var(--steel-700);
+    --gl-rim: var(--steel-500);
+  }
+
+  .group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+
+  .title {
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+  }
+
+  .scale {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .step {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .step i {
+    color: var(--text-2);
+    font: 500 var(--fs-xs) / 1 var(--font-display);
+    font-style: normal;
+    font-variant-numeric: tabular-nums;
+  }
+}

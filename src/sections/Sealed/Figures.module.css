@@ -1,0 +1,84 @@
+/*
+ * Two monumental figures, set on the page with a single hairline over each. Light display type, a short
+ * caption, a quiet date and source. The pair is staggered (the second sits lower), not a grid of boxes.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .figures {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(3rem, 7vw, 7rem);
+    margin-block-start: clamp(4.5rem, 8vw, 8rem);
+  }
+
+  .fig {
+    min-inline-size: 0;
+    padding-block-start: clamp(1.1rem, 2vw, 1.75rem);
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .big {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.04em;
+    margin: 0;
+    max-inline-size: none;
+    color: var(--text-1);
+    font: 300 clamp(6rem, 2.5rem + 14vw, 13.5rem) / 0.86 var(--font-display);
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .unit {
+    margin-block-start: 0.1em;
+    color: var(--accent);
+    font-size: 0.4em;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .cap {
+    margin: clamp(1.1rem, 2vw, 1.75rem) 0 0;
+    max-inline-size: 27ch;
+    color: var(--text-2);
+    font: 400 clamp(1.125rem, 1rem + 0.6vw, 1.5rem) / 1.35 var(--font-sans);
+    text-wrap: balance;
+  }
+
+  .cap b {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 1.25rem;
+    margin: 1.1rem 0 0;
+    max-inline-size: none;
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.3 var(--font-sans);
+  }
+
+  @media (min-width: 720px) {
+    .figures {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .fig[data-offset] {
+      margin-block-start: clamp(2rem, 7vw, 7rem);
+    }
+  }
+
+  /* On wide screens the two figures take the seat's two columns, so the page has one vertical axis. */
+  @media (min-width: 1000px) {
+    .figures {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: var(--col-gap, 4rem);
+    }
+  }
+}

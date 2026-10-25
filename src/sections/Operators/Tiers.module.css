@@ -1,0 +1,232 @@
+/*
+ * The tiers: three emblems on one floor, a name in its own colour, a big number and a spec line. Each
+ * column sets data-tier, so --tier and the accent roles follow from one attribute. No cards, no pills.
+ * The emblems are screen-blended key art: they sit straight on the page (no stacking context between
+ * them and the black), and the only lines are one hairline above the device check.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .row {
+    /* The emblem's width as a multiple of its column: the art has empty margins, so it can overshoot. */
+    --k: 1.2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1rem, -0.5rem + 4vw, 4rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-inline-size: 0;
+  }
+
+  .col {
+    display: grid;
+    align-content: start;
+    min-inline-size: 0;
+  }
+
+  /*
+   * Standing room, tall enough for the Stratus spire. Each emblem is pushed down by the empty strip
+   * under it in its own picture (--below, measured from the art), so all three rest on the stage's floor.
+   */
+  .stage {
+    position: relative;
+    aspect-ratio: 1 / 1.1;
+  }
+
+  /* Measured from the art (share of the square): --below is the empty strip under the emblem, --left the empty strip to its left. */
+  .col[data-tier="cumulus"] {
+    --below: 0.209;
+    --left: 0.174;
+  }
+
+  .col[data-tier="nimbus"] {
+    --below: 0.13;
+    --left: 0.171;
+  }
+
+  .col[data-tier="stratus"] {
+    --below: 0.0559;
+    --left: 0.209;
+  }
+
+  /* Pulled left so the crystal's own edge lines up with its words, and down so it rests on the floor. */
+  .emblem {
+    position: absolute;
+    inset-inline-start: calc(var(--left) * var(--k) * -100%);
+    inset-block-end: 0;
+    inline-size: calc(var(--k) * 100%);
+    translate: 0 calc(var(--below) * 100%);
+    pointer-events: none;
+  }
+
+  /* ---- the words ------------------------------------------------------------------------------- */
+
+  .text {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.4rem;
+    padding-block-start: clamp(1.25rem, 0.8rem + 1.6vw, 2rem);
+    min-inline-size: 0;
+  }
+
+  .name {
+    margin: 0;
+    color: var(--tier);
+    font: 600 clamp(1.25rem, 1rem + 0.9vw, 1.75rem) / 1.1 var(--font-display);
+    letter-spacing: -0.015em;
+  }
+
+  .collateral {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0.2rem 0 0;
+  }
+
+  .collateralValue {
+    color: var(--text-1);
+    font: 300 clamp(2.5rem, 1.4rem + 3.7vw, 5rem) / 1 var(--font-display);
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .unit {
+    color: var(--text-3);
+    font: 400 var(--fs-md) / 1.3 var(--font-sans);
+  }
+
+  .spec {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 1.25em;
+    margin: 0.85rem 0 0;
+    color: var(--text-2);
+    font: 400 var(--fs-sm) / 1.4 var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* One hexagon per thread the tier asks for: four, eight, sixteen. The check lights the ones this device has. */
+  .hexes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    max-inline-size: 15rem;
+    margin-block-start: 0.85rem;
+  }
+
+  .hex {
+    inline-size: 11px;
+    block-size: 12.7px;
+    background: rgb(var(--accent-rgb) / 0.3);
+    clip-path: var(--hex-clip);
+    transition: background var(--dur-3) var(--ease-out) calc(var(--i) * 32ms + var(--col) * 140ms);
+  }
+
+  .hex[data-on="true"] {
+    background: var(--accent);
+  }
+
+  /* ---- the device check ------------------------------------------------------------------------- */
+
+  .check {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 1.75rem clamp(2rem, 5vw, 5rem);
+    padding-block-start: clamp(1.75rem, 1.2rem + 2vw, 3rem);
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .community {
+    margin: 0;
+    max-inline-size: 24ch;
+    color: var(--text-1);
+    font: 300 clamp(1.625rem, 1.1rem + 1.7vw, 2.5rem) / 1.12 var(--font-display);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .community b {
+    font-weight: var(--fw-bold);
+  }
+
+  .action {
+    display: grid;
+    gap: 0.35rem;
+    justify-items: start;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+  }
+
+  /* The line a check ends in, and the quiet one under it. Their rows are reserved so nothing jumps. */
+  .result {
+    margin: 0.65rem 0 0;
+    min-block-size: 1.4em;
+    color: var(--text-1);
+    font: 500 clamp(1.0625rem, 1rem + 0.4vw, 1.3rem) / 1.4 var(--font-sans);
+  }
+
+  .then {
+    margin: 0;
+    min-block-size: 1.4em;
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.4 var(--font-sans);
+  }
+
+  /* ---- tablet and phone: each tier is a row, the emblem beside its words -------------------------- */
+
+  @media (max-width: 899.98px) {
+    .row {
+      --k: 1.5;
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 1.75rem;
+    }
+
+    .col {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+      align-items: center;
+      column-gap: 0.5rem;
+    }
+
+    .stage {
+      aspect-ratio: 1;
+    }
+
+    .emblem {
+      inset-inline-start: calc((1 - var(--k)) * 50%);
+      inset-block: 50% auto;
+      translate: 0 -50%;
+    }
+
+    .text {
+      padding-block-start: 0;
+    }
+
+    /* Eight to a row: sixteen threads read as two even rows, not thirteen and three. */
+    .hexes {
+      max-inline-size: 7.25rem;
+    }
+
+    .check {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .hex {
+    transition-duration: 0.01ms;
+    transition-delay: 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .hex {
+      transition-duration: 0.01ms;
+      transition-delay: 0s;
+    }
+  }
+}

@@ -1,0 +1,624 @@
+/* ==========================================================================
+   Why Flux: design tokens
+   --------------------------------------------------------------------------
+   The single source of colour, type, space, shape, material, layer and motion.
+   Art direction: docs/DESIGN.md ("Blackout to Light", then the Restyle v2 section
+   at its top, which wins). A sibling of Flux Academy and Flux Atlas (dark, hairlines,
+   hex gauges), louder and more cinematic, but restrained: solid colour and crisp
+   light only, no gradients, no glows, no capsules, no numbering as decoration.
+
+   Brand. Flux Brand Book v2.0: Blue Wave #2B61D1 with shades #4F7AD4 and #86A1DA;
+   black, graphite #2D2D2D, gray #717171, white. The Flux symbol is only ever
+   blue, white, black or gray. Tier, status, mood and chart colours are product
+   colours: they never touch the symbol and the symbol never takes them.
+
+   How roles work (components read ROLES, never raw scales)
+     --accent          structure: rings, borders on active, icons, glow
+     --accent-text     links and numbers in the accent (AA on every ink)
+     --accent-strong   brighter sibling for hover edges and active labels
+     --accent-solid    fill of a primary control, with --on-accent on it
+     --accent-rgb      "R G B" triple: rgb(var(--accent-rgb) / 0.4)
+   [data-tier="cumulus|nimbus|stratus"], [data-tone="ok|warn|crit"] and
+   [data-mood="cold"] re-point the same roles for one subtree, so a card, a chip
+   or a whole section can wear a tier, a status or the cold web2 mood with no
+   new component.
+
+   Contents
+      1 Layers and typed properties     8 Space, size, layout
+      2 Brand anchors                   9 Shape: chamfers, hex, masks
+      3 Surfaces, lines, text, light   10 Material: glass, rim, glow, blur
+      4 Accent (flux default)          11 Z layers
+      5 Tiers, status, tones           12 Focus
+      6 Callout and syntax colours     13 Motion
+      7 Type                           14 Remaps: tier, tone, mood, derived
+                                       15 Modes: glass, motion, contrast
+   ========================================================================== */
+
+/* 1. Layer order. Declared first so every later file joins the right layer.
+      reset < tokens < base < ui (the kit) < section (the page) < utility. */
+@layer reset, tokens, base, ui, section, utility;
+
+/* Typed custom properties: animatable and interpolated by the browser. */
+@property --beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* A generic 0..1 progress. Scroll-driven sections write it on their root. */
+@property --p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* The Beat: 1 on a pulse, easing to 0. Tick marks and hairlines read it. */
+@property --flash {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@layer tokens {
+  :root {
+    color-scheme: dark;
+
+    /* ---- 2. Brand anchors (Flux Brand Book v2.0) ---------------------------- */
+    --flux-blue: #2b61d1; /* Blue Wave, the primary */
+    --flux-blue-2: #4f7ad4; /* book shade 1 */
+    --flux-blue-3: #86a1da; /* book shade 2 */
+    --flux-black: #000000;
+    --flux-graphite: #2d2d2d;
+    --flux-gray: #717171;
+    --flux-white: #ffffff;
+
+    /* ---- 3. Surfaces, lines, text, light ------------------------------------- */
+    /* Flux Black lifted toward Graphite in five steps with a 4 to 6 percent Blue
+       Wave cast. Elevation is lightness, never a drop shadow. */
+    --void: #000000; /* behind everything */
+    --ink-0: #06090f; /* slab */
+    --ink-1: #0b0e14; /* raised card inside a slab, code */
+    --ink-2: #11141b; /* hover, input fill */
+    --ink-3: #1a1d23; /* pressed, selected, tracks */
+    --ink-4: #25292f; /* strong fills, scrollbar thumbs */
+    --ink-5: #33373d; /* rare: dividers on ink-4 */
+    --ink-0-rgb: 6 9 15;
+    --ink-1-rgb: 11 14 20;
+
+    --line-1: rgb(255 255 255 / 0.06); /* hairline dividers */
+    --line-2: rgb(255 255 255 / 0.1); /* borders */
+    --line-3: rgb(255 255 255 / 0.18); /* emphasised borders */
+    --line-blue: rgb(134 161 218 / 0.24); /* structural hairline in Blue Wave shade 2 */
+
+    /* Text on --ink-0. 4 is the brand gray: decoration and disabled only. */
+    --text-1: #ffffff; /* 19.9  headings, numbers */
+    --text-2: #d8dde8; /* 14.6  body */
+    --text-3: #a5adbd; /*  8.8  captions, labels */
+    --text-4: #717171; /*  4.1  disabled only */
+
+    /* Attention: white-hot marks "this matters now". */
+    --hot: #ffffff;
+    --hot-rgb: 255 255 255;
+
+    --selection-bg: rgb(43 97 209 / 0.5);
+
+    /* ---- 4. Accent: the Flux default ------------------------------------------ */
+    --accent-100: #e5ebf8;
+    --accent-200: #cedaf0;
+    --accent-300: #abbee4;
+    --accent-400: #86a1da; /* book shade 2 */
+    --accent-500: #4f7ad4; /* book shade 1 */
+    --accent-600: #2b61d1; /* Blue Wave */
+    --accent-700: #1b44a3;
+    --accent-800: #0e2c71;
+    --accent-900: #061843;
+
+    --accent: #4f7ad4;
+    --accent-text: #86a1da;
+    --accent-strong: #abbee4;
+    --accent-solid: #2b61d1;
+    --accent-solid-hover: #3268d7;
+    --accent-solid-active: #1b44a3;
+    --on-accent: #ffffff;
+    --accent-rgb: 79 122 212;
+    --accent-deep-rgb: 43 97 209;
+    --accent-hot-rgb: 174 198 255;
+    --accent-soft: rgb(43 97 209 / 0.18);
+    --accent-soft-2: rgb(43 97 209 / 0.3);
+    --accent-line: rgb(79 122 212 / 0.42);
+    --accent-glow: transparent;
+
+    /* ---- 5. Tiers, status, tones ------------------------------------------------ */
+    /* Tier colours belong to tiers only, and always travel with a name or glyph. */
+    --cumulus: #36d3ff;
+    --nimbus: #c77dff;
+    --stratus: #ffc857;
+    --cumulus-rgb: 54 211 255;
+    --nimbus-rgb: 199 125 255;
+    --stratus-rgb: 255 200 87;
+    --tier-unknown: #a5adbd;
+
+    /* Status: fixed, reserved meaning, never themed. Always icon plus word. */
+    --status-ok: #3fdc95; /* live, healthy, confirmed */
+    --status-pending: #86a1da; /* syncing, checking */
+    --status-warn: #ff9a3d; /* cached, degraded, retiring */
+    --status-crit: #ff5470; /* offline, down, error: the alarm */
+    --status-off: #717171; /* unknown, not checked, simulation */
+    --status-ok-rgb: 63 220 149;
+    --status-pending-rgb: 134 161 218;
+    --status-warn-rgb: 255 154 61;
+    --status-crit-rgb: 255 84 112;
+    --status-off-rgb: 113 113 113;
+    --status: var(--status-off);
+    --status-rgb: var(--status-off-rgb);
+
+    /* The alarm is the loud counter-colour of the story: outages, kills, blackouts. */
+    --alarm: var(--status-crit);
+    --alarm-rgb: var(--status-crit-rgb);
+
+    /* The cold web2 mood: steel instead of blue. See [data-mood="cold"] below. */
+    --steel-100: #e1e6ef;
+    --steel-300: #c3ccdb;
+    --steel-500: #9aa6bb;
+    --steel-700: #626e84;
+    --steel-900: #2a313e;
+
+    /* ---- 6. Callout and syntax colours ------------------------------------------- */
+    --callout-gotcha: var(--status-warn);
+    --callout-tip: var(--status-ok);
+    --callout-wild: #b9c9f7;
+
+    --code-bg: var(--ink-1);
+    --code-fg: #d8dde8;
+    --code-comment: #7a859c;
+    --code-keyword: #8ab4ff;
+    --code-fn: #b9c9f7;
+    --code-string: #7fdbb6;
+    --code-number: #f2b880;
+    --code-key: #9ccbff;
+    --code-punct: #8f98ac;
+
+    /* ---- 7. Type ------------------------------------------------------------------- */
+    --font-display: "Montserrat Variable", "Montserrat", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    --font-sans: "Open Sans Variable", "Open Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-accent: "Lora Variable", "Lora", Georgia, "Times New Roman", serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+
+    --fs-2xs: 0.6875rem; /* 11  ticks, kbd, meta */
+    --fs-xs: 0.75rem; /* 12  labels, chips */
+    --fs-sm: 0.8125rem; /* 13  dense UI */
+    --fs-md: 0.9375rem; /* 15  UI body */
+    --fs-body: clamp(1rem, 0.975rem + 0.12vw, 1.0625rem);
+    --fs-lead: clamp(1.0625rem, 1rem + 0.4vw, 1.375rem);
+    --fs-h4: 1.0625rem;
+    --fs-h3: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+    --fs-h2: clamp(2.125rem, 1.2rem + 4vw, 4.25rem); /* section titles */
+    --fs-title: clamp(2.375rem, 0.6rem + 5.6vw, 5.5rem); /* section titles (SectionHeader) */
+    --fs-display: clamp(2.75rem, 1.3rem + 6.4vw, 7rem); /* big statements */
+    --fs-mega: clamp(3rem, 0.9rem + 9.4vw, 10.5rem); /* the hero headline */
+    --fs-stat: clamp(2rem, 1.4rem + 2.6vw, 3.75rem); /* big numbers */
+    --fs-stat-xl: clamp(3rem, 1.6rem + 6vw, 8rem); /* proof-wall numbers */
+    --fs-code: 0.875rem;
+
+    --fw-light: 300;
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+    --fw-black: 800;
+
+    --lh-mega: 0.9;
+    --lh-display: 0.95;
+    --lh-tight: 1.1;
+    --lh-snug: 1.25;
+    --lh-normal: 1.45;
+    --lh-body: 1.65;
+    --lh-code: 1.6;
+
+    --tracking-mega: -0.055em;
+    --tracking-display: -0.04em;
+    --tracking-h2: -0.03em;
+    --tracking-heading: -0.012em;
+    --tracking-label: 0.12em;
+    --measure: 62ch;
+
+    --type-mega: 300 var(--fs-mega) / var(--lh-mega) var(--font-display);
+    --type-display: 300 var(--fs-display) / var(--lh-display) var(--font-display);
+    --type-h2: 600 var(--fs-h2) / 1.02 var(--font-display);
+    --type-h3: 600 var(--fs-h3) / 1.2 var(--font-display);
+    --type-h4: 600 var(--fs-h4) / 1.3 var(--font-display);
+    --type-lead: 400 var(--fs-lead) / var(--lh-body) var(--font-sans);
+    --type-body: 400 var(--fs-body) / var(--lh-body) var(--font-sans);
+    --type-ui: 500 var(--fs-md) / var(--lh-snug) var(--font-sans);
+    --type-label: 500 var(--fs-xs) / 1.2 var(--font-mono);
+    --type-code: 400 var(--fs-code) / var(--lh-code) var(--font-mono);
+    --type-stat: 300 var(--fs-stat) / 1 var(--font-display);
+
+    /* ---- 8. Space, size, layout ------------------------------------------------------- */
+    /* A 4 px scale: --space-n is n * 4 px. */
+    --space-half: 2px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 28px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+    --space-24: 96px;
+
+    --r-xs: 2px;
+    --r-sm: 4px;
+    --r-pill: 999px; /* the nav and toggles only: nothing else is a pill */
+
+    --gutter: clamp(1.125rem, 4vw, 3.5rem);
+    --container: 1240px;
+    --container-wide: 1520px;
+    --container-narrow: 760px;
+    --nav-h: 60px;
+    --nav-h-condensed: 52px;
+    --header-offset: calc(var(--nav-h-condensed) + 12px);
+    --section-y: clamp(5rem, 3rem + 9vw, 11rem); /* vertical padding of a section */
+    --section-gap: clamp(2rem, 1.2rem + 3vw, 4rem); /* header to content */
+    --grid-gap: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+    --touch-min: 44px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+
+    /* Breakpoints (media queries cannot read custom properties, so write the number):
+       phone < 720, tablet 720 to 1099, desktop 1100 to 1679, wide 1680+. Components size
+       themselves with container queries where they can. */
+    --bp-phone: 720px;
+    --bp-desktop: 1100px;
+    --bp-wide: 1680px;
+
+    /* ---- 9. Shape: chamfers, hex, masks ---------------------------------------------- */
+    --chamfer-xs: 5px;
+    --chamfer-sm: 8px; /* inputs, chips */
+    --chamfer: 14px; /* buttons */
+    --chamfer-panel: 12px; /* panels (restyle v2: calmer than the old 14) */
+    --chamfer-lg: 22px; /* large panels */
+    --bevel: 4px; /* the micro bevel on the two uncut corners */
+    --hex-clip: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); /* pointy-top */
+    --hex-clip-flat: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    /* The brand's hexagon lattice as a MASK (pour any colour through it). Tile 34.64 x 60. */
+    --pattern-hex-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34.64' height='60' viewBox='0 0 34.64 60'%3E%3Cg fill='none' stroke='%23fff' stroke-width='1'%3E%3Cpath d='M17.32 0L34.64 10L34.64 30L17.32 40L0 30L0 10Z'/%3E%3Cpath d='M0 30L17.32 40L17.32 60L0 70L-17.32 60L-17.32 40Z'/%3E%3Cpath d='M34.64 30L51.96 40L51.96 60L34.64 70L17.32 60L17.32 40Z'/%3E%3Cpath d='M0 -30L17.32 -20L17.32 0L0 10L-17.32 0L-17.32 -20Z'/%3E%3Cpath d='M34.64 -30L51.96 -20L51.96 0L34.64 10L17.32 0L17.32 -20Z'/%3E%3Cpath d='M17.32 60L34.64 70L34.64 90L17.32 100L0 90L0 70Z'/%3E%3C/g%3E%3C/svg%3E");
+    --pattern-hex-w: 34.64px;
+    --pattern-hex-h: 60px;
+
+    /* Crosshairs as masks: the "+" at slab corners (11 px) and the probe (15 px). */
+    --mask-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11' shape-rendering='crispEdges'%3E%3Cpath d='M5 0h1v11H5zM0 5h11v1H0z' fill='%23fff'/%3E%3C/svg%3E");
+    --mask-plus-lg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 15 15' shape-rendering='crispEdges'%3E%3Cpath d='M7 0h1v15H7zM0 7h15v1H0z' fill='%23fff'/%3E%3C/svg%3E");
+
+    --grain-opacity: 0.05;
+    --grain-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+    /* ---- 10. Material: glass, rim, glow, blur ----------------------------------------------- */
+    --blur-1: 6px;
+    --blur-2: 12px;
+    --blur-3: 18px; /* the glass */
+    --glass-saturate: 1.4;
+    --glass-blur: var(--blur-3);
+    --glass-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    --glass-bg: rgb(var(--ink-0-rgb) / 0.62);
+    --glass-bg-strong: rgb(var(--ink-0-rgb) / 0.84);
+    --glass-bg-solid: var(--ink-0);
+    --inset-hi: inset 0 1px 0 rgb(255 255 255 / 0.07);
+    --scrim: rgb(0 0 0 / 0.62);
+    --panel-edge: rgb(255 255 255 / 0.14); /* a Panel's single hairline */
+
+    /* ---- 11. Z layers ------------------------------------------------------------------------- */
+    --z-stage: -1;
+    --z-backdrop: 0;
+    --z-page: 1;
+    --z-raised: 10;
+    --z-rail: 55;
+    --z-nav: 60;
+    --z-sheet: 70; /* mobile nav sheet */
+    --z-modal: 120;
+    --z-toast: 140;
+    --z-tooltip: 150;
+    --z-grain: 180;
+
+    /* ---- 12. Focus --------------------------------------------------------------------------- */
+    --focus-color: #ffffff;
+    --focus-offset: 3px;
+
+    /* ---- 13. Motion --------------------------------------------------------------------------- */
+    --motion-scale: 1; /* 0 when reduced; JS-driven timings multiply by this */
+    --dur-1: 120ms; /* hover colour, focus rings */
+    --dur-2: 220ms; /* small UI transitions */
+    --dur-3: 380ms; /* panels, drawers, tooltips */
+    --dur-4: 700ms; /* section reveals, count-ups, step changes */
+    --dur-5: 1200ms; /* camera moves, hero beats */
+    --dur-cinema: 1800ms; /* the entrance and the big set pieces */
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-snap: cubic-bezier(0.2, 0.9, 0.2, 1.15);
+    --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-cinema: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-linear: linear;
+
+    --stagger: 70ms; /* reveal stagger per item */
+    --reveal-y: 28px;
+    --reveal-blur: 10px;
+    --press-scale: 0.98; /* press compression */
+  }
+
+  /* ---- 14. Remaps ------------------------------------------------------------------------------ */
+
+  /* 14a. data-tier: exposes --tier* and re-points the accent roles for the subtree. */
+  [data-tier="cumulus"] {
+    --tier: var(--cumulus);
+    --tier-rgb: var(--cumulus-rgb);
+    --accent: #36d3ff;
+    --accent-text: #36d3ff;
+    --accent-strong: #a0e6ff;
+    --accent-solid: #36d3ff;
+    --accent-solid-hover: #5fdcff;
+    --accent-solid-active: #02b0d8;
+    --on-accent: #04101a;
+    --accent-rgb: 54 211 255;
+    --accent-deep-rgb: 2 176 216;
+    --accent-hot-rgb: 160 230 255;
+    --accent-soft: rgb(54 211 255 / 0.14);
+    --accent-soft-2: rgb(54 211 255 / 0.26);
+    --accent-line: rgb(54 211 255 / 0.4);
+    --accent-glow: transparent;
+    --accent-200: #cef2ff;
+  }
+
+  [data-tier="nimbus"] {
+    --tier: var(--nimbus);
+    --tier-rgb: var(--nimbus-rgb);
+    --accent: #c77dff;
+    --accent-text: #c77dff;
+    --accent-strong: #ddb7ff;
+    --accent-solid: #c77dff;
+    --accent-solid-hover: #d49aff;
+    --accent-solid-active: #a95fdf;
+    --on-accent: #04101a;
+    --accent-rgb: 199 125 255;
+    --accent-deep-rgb: 169 95 223;
+    --accent-hot-rgb: 221 183 255;
+    --accent-soft: rgb(199 125 255 / 0.15);
+    --accent-soft-2: rgb(199 125 255 / 0.27);
+    --accent-line: rgb(199 125 255 / 0.42);
+    --accent-glow: transparent;
+    --accent-200: #ecd8ff;
+  }
+
+  [data-tier="stratus"] {
+    --tier: var(--stratus);
+    --tier-rgb: var(--stratus-rgb);
+    --accent: #ffc857;
+    --accent-text: #ffc857;
+    --accent-strong: #ffe0a7;
+    --accent-solid: #ffc857;
+    --accent-solid-hover: #ffd47a;
+    --accent-solid-active: #daa42a;
+    --on-accent: #04101a;
+    --accent-rgb: 255 200 87;
+    --accent-deep-rgb: 218 164 42;
+    --accent-hot-rgb: 255 224 167;
+    --accent-soft: rgb(255 200 87 / 0.14);
+    --accent-soft-2: rgb(255 200 87 / 0.26);
+    --accent-line: rgb(255 200 87 / 0.42);
+    --accent-glow: transparent;
+    --accent-200: #ffeed1;
+  }
+
+  [data-tier="unknown"] {
+    --tier: var(--tier-unknown);
+    --tier-rgb: 165 173 189;
+  }
+
+  /* 14b. data-tone: status colours for a subtree (a warning panel, a danger button). */
+  [data-tone="ok"] {
+    --status: var(--status-ok);
+    --status-rgb: var(--status-ok-rgb);
+    --accent: #3fdc95;
+    --accent-text: #3fdc95;
+    --accent-strong: #9cf0c5;
+    --accent-solid: #3fdc95;
+    --accent-solid-hover: #5fe6a8;
+    --accent-solid-active: #2bb877;
+    --on-accent: #04130c;
+    --accent-rgb: 63 220 149;
+    --accent-deep-rgb: 43 184 119;
+    --accent-hot-rgb: 156 240 197;
+    --accent-soft: rgb(63 220 149 / 0.14);
+    --accent-soft-2: rgb(63 220 149 / 0.26);
+    --accent-line: rgb(63 220 149 / 0.4);
+    --accent-glow: transparent;
+    --accent-200: #c6f7de;
+  }
+
+  [data-tone="warn"] {
+    --status: var(--status-warn);
+    --status-rgb: var(--status-warn-rgb);
+    --accent: #ff9a3d;
+    --accent-text: #ff9a3d;
+    --accent-strong: #ffc592;
+    --accent-solid: #ff9a3d;
+    --accent-solid-hover: #ffad5f;
+    --accent-solid-active: #e07b1c;
+    --on-accent: #1a0d00;
+    --accent-rgb: 255 154 61;
+    --accent-deep-rgb: 224 123 28;
+    --accent-hot-rgb: 255 197 146;
+    --accent-soft: rgb(255 154 61 / 0.14);
+    --accent-soft-2: rgb(255 154 61 / 0.26);
+    --accent-line: rgb(255 154 61 / 0.42);
+    --accent-glow: transparent;
+    --accent-200: #ffe2c7;
+  }
+
+  [data-tone="crit"] {
+    --status: var(--status-crit);
+    --status-rgb: var(--status-crit-rgb);
+    --accent: #ff5470;
+    --accent-text: #ff7a90;
+    --accent-strong: #ffa3b2;
+    --accent-solid: #e8334f;
+    --accent-solid-hover: #f04a64;
+    --accent-solid-active: #c4213b;
+    --on-accent: #ffffff;
+    --accent-rgb: 255 84 112;
+    --accent-deep-rgb: 232 51 79;
+    --accent-hot-rgb: 255 163 178;
+    --accent-soft: rgb(255 84 112 / 0.15);
+    --accent-soft-2: rgb(255 84 112 / 0.27);
+    --accent-line: rgb(255 84 112 / 0.42);
+    --accent-glow: transparent;
+    --accent-200: #ffd3da;
+  }
+
+  /* 14c. data-mood="cold": the web2 world. Steel instead of Flux blue, for the whole
+     subtree (the fragile cloud section, the "single region" lane of the simulation).
+     The alarm red is still --alarm. */
+  [data-mood="cold"] {
+    --accent: #9aa6bb;
+    --accent-text: #c3ccdb;
+    --accent-strong: #e1e6ef;
+    --accent-solid: #c3ccdb;
+    --accent-solid-hover: #d6dde9;
+    --accent-solid-active: #9aa6bb;
+    --on-accent: #0a0d12;
+    --accent-rgb: 154 166 187;
+    --accent-deep-rgb: 98 110 132;
+    --accent-hot-rgb: 225 230 239;
+    --accent-soft: rgb(154 166 187 / 0.14);
+    --accent-soft-2: rgb(154 166 187 / 0.26);
+    --accent-line: rgb(154 166 187 / 0.4);
+    --accent-glow: transparent;
+    --accent-200: #e1e6ef;
+  }
+
+  /* Status: data-status exposes --status and --status-soft without touching the accent. */
+  [data-status="ok"] {
+    --status: var(--status-ok);
+    --status-rgb: var(--status-ok-rgb);
+  }
+  [data-status="pending"] {
+    --status: var(--status-pending);
+    --status-rgb: var(--status-pending-rgb);
+  }
+  [data-status="warn"] {
+    --status: var(--status-warn);
+    --status-rgb: var(--status-warn-rgb);
+  }
+  [data-status="crit"] {
+    --status: var(--status-crit);
+    --status-rgb: var(--status-crit-rgb);
+  }
+  [data-status="off"] {
+    --status: var(--status-off);
+    --status-rgb: var(--status-off-rgb);
+  }
+
+  /* 14d. Derived roles. Built from the accent (or status) roles, so they are declared on
+     every element that re-points those roles. */
+  :root,
+  [data-tier],
+  [data-tone],
+  [data-mood],
+  [data-status] {
+    --hot-2: var(--accent-200);
+    --hot-glow: transparent;
+
+    /* Blueprint: the annotation layer. Leader lines, dimension lines, ticks. */
+    --blueprint: rgb(var(--accent-rgb) / 0.4);
+    --blueprint-strong: rgb(var(--accent-rgb) / 0.72);
+    --blueprint-text: var(--accent-text);
+
+    --rim-1: rgb(var(--accent-rgb) / 0.24);
+    --rim-2: rgb(var(--accent-rgb) / 0.42);
+    --rim-3: rgb(var(--accent-hot-rgb) / 0.62);
+
+    /* Glow: retired (house rule: no glows, no gradients). The names stay so nothing that reads them
+       breaks, and they paint nothing. Use a solid line or a flat tint instead. */
+    --glow-1: 0 0 0 0 transparent;
+    --glow-2: 0 0 0 0 transparent;
+    --glow-hot: 0 0 0 0 transparent;
+
+    --status-soft: rgb(var(--status-rgb) / 0.16);
+    --focus-ring: 0 0 0 2px var(--ink-0), 0 0 0 4px var(--accent-text);
+  }
+
+  /* ---- 15. Modes ------------------------------------------------------------------------------- */
+
+  /* Glass quality. The shell sets html[data-glass="lite"] on Save-Data or a slow device: no
+     backdrop blur, a denser fill, no grain. The slabs stay legible. */
+  :root[data-glass="lite"] {
+    --glass-blur: 0px;
+    --glass-saturate: 1;
+    --glass-bg: rgb(var(--ink-0-rgb) / 0.86);
+    --glass-bg-strong: rgb(var(--ink-0-rgb) / 0.94);
+    --grain-opacity: 0;
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    :root {
+      --glass-blur: 0px;
+      --glass-saturate: 1;
+      --glass-bg: rgb(var(--ink-0-rgb) / 0.9);
+      --glass-bg-strong: rgb(var(--ink-0-rgb) / 0.96);
+      --grain-opacity: 0;
+    }
+  }
+
+  /* Motion. The OS preference and the visitor's override (html[data-motion]) both land here.
+     Reduced keeps opacity cross-fades and removes travel, scale, parallax, springs and loops. */
+  @media (prefers-reduced-motion: reduce) {
+    :root:not([data-motion="full"]) {
+      --motion-scale: 0;
+      --dur-3: 160ms;
+      --dur-4: 200ms;
+      --dur-5: 240ms;
+      --dur-cinema: 320ms;
+      --stagger: 0ms;
+      --reveal-y: 0px;
+      --reveal-blur: 0px;
+      --press-scale: 1;
+      --ease-snap: var(--ease-standard);
+    }
+  }
+
+  :root[data-motion="reduced"] {
+    --motion-scale: 0;
+    --dur-3: 160ms;
+    --dur-4: 200ms;
+    --dur-5: 240ms;
+    --dur-cinema: 320ms;
+    --stagger: 0ms;
+    --reveal-y: 0px;
+    --reveal-blur: 0px;
+    --press-scale: 1;
+    --ease-snap: var(--ease-standard);
+  }
+
+  /* Contrast. Borders and tertiary text step up; decoration steps down. */
+  @media (prefers-contrast: more) {
+    :root {
+      --line-1: rgb(255 255 255 / 0.2);
+      --line-2: rgb(255 255 255 / 0.36);
+      --line-3: rgb(255 255 255 / 0.6);
+      --text-3: #c6ccd8;
+      --text-4: #9a9a9a;
+      --glass-bg: rgb(var(--ink-0-rgb) / 0.92);
+      --glass-bg-strong: rgb(var(--ink-0-rgb) / 0.98);
+      --grain-opacity: 0;
+      --blueprint: rgb(var(--accent-rgb) / 0.75);
+      --code-comment: #9aa5bb;
+    }
+  }
+}

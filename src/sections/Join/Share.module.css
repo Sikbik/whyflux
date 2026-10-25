@@ -1,0 +1,115 @@
+/*
+ * One share moment, the page's last, set as type: the sentence, the buttons, and under both one quiet line with
+ * the live node count. Calm: nothing here moves except the pulse.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .share {
+    display: grid;
+    gap: clamp(2rem, 1.2rem + 3vw, 3.5rem);
+    margin-block-start: clamp(3rem, 2rem + 4vw, 6rem);
+    padding-block-start: clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
+    border-block-start: 1px solid var(--line-2);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(1.5rem, 1rem + 3vw, 4rem);
+  }
+
+  /* Display weight 300 with the key words in bold, set here (not with .t-display, which would win the layer
+     order over the size below). */
+  .title {
+    margin: 0;
+    max-inline-size: 18ch;
+    font: 300 clamp(2rem, 1.2rem + 3vw, 3.75rem) / 1.04 var(--font-display);
+    letter-spacing: var(--tracking-display);
+    color: var(--text-1);
+    text-wrap: balance;
+  }
+
+  .title b {
+    font-weight: var(--fw-bold);
+    color: var(--accent-strong);
+  }
+
+  .row > :last-child {
+    justify-content: flex-end;
+  }
+
+  /* ---- the live line --------------------------------------------------------------------------------------- */
+
+  .pulse {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .pulse p {
+    margin: 0;
+    color: var(--text-2);
+    font-size: var(--fs-md);
+  }
+
+  .count {
+    color: var(--text-1);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* "Live", said with a pulse: a hard dot and one hairline ring that leaves it. No glow. */
+  .dot {
+    position: relative;
+    flex: none;
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: 50%;
+    background: var(--status-ok);
+  }
+
+  .dot::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1px solid var(--status-ok);
+    border-radius: 50%;
+    opacity: 0;
+    animation: share-ping 2.4s var(--ease-out) infinite;
+  }
+
+  @keyframes share-ping {
+    from {
+      opacity: 0.9;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 3.6;
+    }
+  }
+
+  @media (max-width: 899.98px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .row > :last-child {
+      justify-content: flex-start;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .dot::after {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .dot::after {
+      animation: none;
+    }
+  }
+}

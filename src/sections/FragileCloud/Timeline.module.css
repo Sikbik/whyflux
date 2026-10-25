@@ -1,0 +1,257 @@
+/*
+ * The incident ruler: every incident by date, a row per company, rows divided by one hairline.
+ * Markers are hexagons sized by the square root of the hours offline (dashed and hollow when the data
+ * has no hours: it ran for days or longer). The chosen one is white with a crisp ring and a playhead
+ * marks its date. Solid colours and hairlines only: no gradients, no glow.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .ruler {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: 0 0.5rem;
+    min-inline-size: 0;
+  }
+
+  .gutter {
+    position: relative;
+    block-size: var(--h);
+  }
+
+  .rowLabel {
+    position: absolute;
+    inset-inline: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--text-2);
+    font: 500 var(--fs-sm) / 1 var(--font-sans);
+  }
+
+  .rowShare {
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stage {
+    min-inline-size: 0;
+  }
+
+  .plot {
+    position: relative;
+    block-size: var(--h);
+  }
+
+  .track {
+    position: absolute;
+    inset-inline: 0;
+    border-block-start: 1px solid var(--line-1);
+    pointer-events: none;
+  }
+
+  .playhead {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--pad) + var(--t) * (100% - 2 * var(--pad)));
+    inline-size: 1px;
+    background: rgb(255 255 255 / 0.34);
+    pointer-events: none;
+    transition: inset-inline-start var(--dur-4) var(--ease-out);
+  }
+
+  /* ---- markers ------------------------------------------------------------------------------------------ */
+
+  .marker {
+    --tone: var(--steel-300);
+    --fill: var(--tone);
+    --stroke: var(--tone);
+    position: absolute;
+    inset-inline-start: calc(var(--pad) + var(--t) * (100% - 2 * var(--pad)));
+    inset-block-start: var(--y);
+    inline-size: var(--d);
+    block-size: calc(var(--d) * 0.8660254);
+    translate: -50% -50%;
+    padding: 0;
+    color: var(--tone);
+    cursor: pointer;
+    transition:
+      scale var(--dur-2) var(--ease-out),
+      opacity var(--dur-3) var(--ease-out);
+  }
+
+  .marker[data-group="azure"] {
+    --tone: var(--steel-500);
+  }
+
+  .marker[data-group="google"] {
+    --tone: var(--steel-700);
+  }
+
+  .marker[data-group="other"] {
+    --tone: var(--steel-500);
+    --fill: var(--steel-900);
+  }
+
+  .marker[data-open] {
+    --fill: rgb(var(--accent-rgb) / 0.16);
+  }
+
+  .marker[data-open] .body {
+    stroke-dasharray: 5 4;
+  }
+
+  .hex {
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+  }
+
+  .body {
+    fill: var(--fill);
+    stroke: var(--stroke);
+    stroke-width: 1.4;
+    transition:
+      fill var(--dur-2) var(--ease-out),
+      stroke var(--dur-2) var(--ease-out);
+  }
+
+  /* The chosen one wears a crisp ring a little way out. */
+  .ring {
+    fill: none;
+    stroke: var(--hot);
+    stroke-width: 1;
+    transform-box: fill-box;
+    transform-origin: center;
+    scale: 1.55;
+    opacity: 0;
+    transition: opacity var(--dur-2) var(--ease-out);
+  }
+
+  .marker:hover {
+    scale: 1.16;
+    --stroke: var(--steel-100);
+  }
+
+  .marker[data-open]:hover {
+    --fill: rgb(var(--accent-rgb) / 0.3);
+  }
+
+  .marker:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 7px;
+  }
+
+  /* The chosen marker stays white, hollow or not, hovered or not. */
+  .marker[data-on],
+  .marker[data-on]:hover,
+  .marker[data-on][data-open],
+  .marker[data-on][data-open]:hover {
+    z-index: 2;
+    scale: 1.1;
+    --fill: var(--hot);
+    --stroke: var(--hot);
+  }
+
+  .marker[data-on] .ring {
+    opacity: 0.8;
+  }
+
+  .marker:not([data-live]) {
+    opacity: 0.13;
+    pointer-events: none;
+  }
+
+  /* ---- the years ----------------------------------------------------------------------------------------- */
+
+  .years {
+    position: relative;
+    block-size: 1.6rem;
+    margin-block-start: 0.55rem;
+    padding-inline: var(--pad);
+    border-block-start: 1px solid var(--line-1);
+  }
+
+  .years > span {
+    position: absolute;
+    inset-block-start: 0.5rem;
+    inset-inline-start: calc(var(--pad) + var(--t) * (100% - 2 * var(--pad)));
+    color: var(--text-3);
+    font: 500 var(--fs-xs) / 1 var(--font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- phones: plain words in a row ---------------------------------------------------------------------- */
+
+  .list {
+    display: flex;
+    gap: clamp(1.4rem, 6vw, 2rem);
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+    border-block-end: 1px solid var(--line-1);
+  }
+
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .item {
+    position: relative;
+    flex: none;
+    display: grid;
+    align-content: center;
+    gap: 0.2rem;
+    min-block-size: var(--touch-min);
+    padding-block: 0.55rem 0.8rem;
+    scroll-snap-align: center;
+    color: var(--text-3);
+    text-align: start;
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .who {
+    font: 600 var(--fs-md) / 1.1 var(--font-display);
+    letter-spacing: -0.005em;
+  }
+
+  .when {
+    font: 500 var(--fs-xs) / 1.1 var(--font-sans);
+  }
+
+  .item[data-on] {
+    color: var(--text-1);
+  }
+
+  .item[data-on]::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: -1px;
+    block-size: 2px;
+    background: var(--hot);
+  }
+
+  .item:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
+
+  /* ---- reduced motion ------------------------------------------------------------------------------------ */
+
+  :global(html[data-motion="reduced"]) .playhead,
+  :global(html[data-motion="reduced"]) .marker {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .playhead,
+    :global(html:not([data-motion="full"])) .marker {
+      transition: none;
+    }
+  }
+}

@@ -1,0 +1,15 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .wrap {
+    position: relative;
+  }
+
+  .stage {
+    position: sticky;
+    inset-block-start: var(--stage-top, 0px);
+    block-size: var(--stage-h, 100svh);
+    /* The stage clips its own plates, not the page's scroll. */
+    overflow: clip;
+  }
+}

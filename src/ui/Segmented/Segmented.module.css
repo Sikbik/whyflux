@@ -1,0 +1,100 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .seg {
+    --h: 40px;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: stretch;
+    padding: 3px;
+    border: 1px solid var(--line-2);
+    border-radius: var(--r-pill);
+    background: rgb(var(--ink-0-rgb) / 0.7);
+    -webkit-backdrop-filter: blur(var(--blur-2));
+    backdrop-filter: blur(var(--blur-2));
+    max-inline-size: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .seg::-webkit-scrollbar {
+    display: none;
+  }
+
+  .seg[data-size="sm"] {
+    --h: 32px;
+  }
+
+  .seg[data-full="true"] {
+    display: flex;
+  }
+
+  .ind {
+    position: absolute;
+    inset-block: 3px;
+    inset-inline-start: 0;
+    z-index: -1;
+    border-radius: var(--r-pill);
+    background: rgb(var(--accent-rgb) / 0.3);
+    box-shadow: inset 0 0 0 1px rgb(var(--accent-hot-rgb) / 0.55);
+    opacity: 0;
+  }
+
+  .ind[data-ready="true"] {
+    opacity: 1;
+    transition:
+      translate var(--dur-3) var(--ease-out),
+      inline-size var(--dur-3) var(--ease-out);
+  }
+
+  .opt {
+    flex: 1 1 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    min-block-size: var(--h);
+    padding: 0 1.05em;
+    border-radius: var(--r-pill);
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    transition: color var(--dur-2) var(--ease-out);
+  }
+
+  @media (pointer: coarse) {
+    .opt {
+      min-block-size: max(var(--h), var(--touch-min));
+    }
+  }
+
+  .opt:hover:not(:disabled) {
+    color: var(--text-1);
+  }
+
+  .opt[aria-checked="true"] {
+    color: var(--text-1);
+  }
+
+  .opt:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .opt:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: -2px;
+  }
+
+  :global(html[data-motion="reduced"]) .ind {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .ind {
+      transition: none;
+    }
+  }
+}

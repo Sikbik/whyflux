@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+  The social card (1200 x 630). A self-contained page rendered to public/og.png with the shot tool:
+    cd /tmp/whyflux-tools && node shot.mjs "http://127.0.0.1:5190/tools/og.html" /home/stache/.t3/projects/whyflux/public/og.png --w 1200 --h 630 --wait 1500
+  It uses the page's own fonts and the generated og-backdrop plate. No numbers on purpose: it is a static image.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Why Flux: social card</title>
+    <link rel="stylesheet" href="/src/styles/fonts.css" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #000;
+      }
+      .card {
+        position: relative;
+        inline-size: 1200px;
+        block-size: 630px;
+        overflow: hidden;
+        background: #000;
+        color: #fff;
+        font-family: "Montserrat Variable", "Montserrat", system-ui, sans-serif;
+      }
+      .plate {
+        position: absolute;
+        inset: 0;
+        background: url("/art/og-backdrop.webp") 100% 50% / cover no-repeat;
+      }
+      /* keep the left two thirds dark for the type */
+      .shade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, #000 0%, rgb(0 0 0 / 0.86) 42%, transparent 72%);
+      }
+      .brand {
+        position: absolute;
+        inset-block-start: 56px;
+        inset-inline-start: 64px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 30px;
+        font-weight: 300;
+        letter-spacing: -0.01em;
+      }
+      .brand img {
+        inline-size: 44px;
+        block-size: 44px;
+      }
+      .brand b {
+        font-weight: 700;
+      }
+      .copy {
+        position: absolute;
+        inset-inline-start: 64px;
+        inset-block-start: 190px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 104px;
+        line-height: 0.96;
+        letter-spacing: -0.055em;
+        font-weight: 300;
+      }
+      h1 b {
+        display: block;
+        font-weight: 700;
+        color: #abbee4;
+      }
+      p {
+        margin: 40px 0 0;
+        font-size: 30px;
+        font-weight: 400;
+        letter-spacing: -0.005em;
+        color: #a5adbd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="plate"></div>
+      <div class="shade"></div>
+      <div class="brand"><img src="/brand/Flux_symbol_blue-white.svg" alt="" /><span>Why <b>Flux</b></span></div>
+      <div class="copy">
+        <h1>Pull the plug<b>It keeps running</b></h1>
+        <p>The cloud no single provider can switch off</p>
+      </div>
+    </div>
+  </body>
+</html>

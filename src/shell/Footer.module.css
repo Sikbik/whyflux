@@ -1,0 +1,122 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .footer {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    border-block-start: 1px solid var(--line-1);
+    background: var(--ink-0);
+    padding-block: clamp(3rem, 2rem + 5vw, 6rem) calc(2rem + var(--safe-bottom));
+  }
+
+  .inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(2rem, 1rem + 4vw, 4rem);
+  }
+
+  .top {
+    display: grid;
+    gap: clamp(2rem, 1rem + 4vw, 4rem);
+  }
+
+  @media (min-width: 1000px) {
+    .top {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+    }
+  }
+
+  .lead {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    font: 300 1.75rem / 1 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--text-1);
+  }
+
+  .brand b {
+    font-weight: 700;
+  }
+
+  .blurb {
+    max-inline-size: 44ch;
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 2rem 1.5rem;
+  }
+
+  .colTitle {
+    margin-block-end: 0.9rem;
+    color: var(--text-3);
+    font: 500 var(--fs-xs) / 1 var(--font-display);
+    letter-spacing: 0.02em;
+  }
+
+  .list {
+    display: grid;
+    gap: 0.1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    min-block-size: 32px;
+    color: var(--text-2);
+    font: 400 var(--fs-md) / 1.3 var(--font-sans);
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .link:hover {
+    color: var(--text-1);
+  }
+
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--line-1);
+  }
+
+  .note {
+    max-inline-size: 70ch;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .top2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-block-size: var(--touch-min);
+    color: var(--text-3);
+    font: 500 var(--fs-sm) / 1 var(--font-display);
+    transition: color var(--dur-1) var(--ease-out);
+  }
+
+  .top2:hover {
+    color: var(--text-1);
+  }
+}

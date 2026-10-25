@@ -1,0 +1,35 @@
+/*
+ * Chapter 12: Your move. The stage is a size container (its width sizes the sunrise in cqw) and the
+ * owner of the dawn's one warm colour. Title above the sky, the ways in below it.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .stage {
+    /* The first warm white on the page. Used for the sun, the lit row and the emphasised word. */
+    --dawn: #ffeccf;
+    --dawn-rgb: 255 236 207;
+    position: relative;
+    isolation: isolate;
+    container-type: inline-size;
+  }
+
+  .top {
+    position: relative;
+    z-index: 2;
+    padding-block-start: calc(var(--section-y) * 0.35);
+  }
+
+  .head {
+    margin-block-end: 0;
+    --accent-strong: var(--dawn);
+  }
+
+  .bottom {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    padding-block-end: clamp(4rem, 2.5rem + 6vw, 8rem);
+  }
+}

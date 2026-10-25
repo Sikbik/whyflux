@@ -1,0 +1,67 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .region {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: calc(var(--safe-bottom) + 1.25rem);
+    z-index: var(--z-toast);
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+
+  /* One plain line on a flat dark slab: a hairline, a small radius, no pill, no glow. */
+  .toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--line-3);
+    border-radius: var(--r-sm);
+    background: rgb(var(--ink-0-rgb) / 0.96);
+    color: var(--text-1);
+    font: 500 var(--fs-sm) / 1.2 var(--font-display);
+    animation: in var(--dur-3) var(--ease-out) both;
+  }
+
+  /* A status shows as a small solid dot before the words, never a coloured capsule. */
+  .toast[data-tone]::before {
+    content: "";
+    flex: none;
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: 50%;
+    background: var(--tone, var(--accent));
+  }
+
+  .toast[data-tone="ok"] {
+    --tone: var(--status-ok);
+  }
+
+  .toast[data-tone="warn"] {
+    --tone: var(--status-warn);
+  }
+
+  .toast[data-tone="crit"] {
+    --tone: var(--status-crit);
+  }
+
+  @keyframes in {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .toast {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .toast {
+      animation: none;
+    }
+  }
+}

@@ -1,0 +1,63 @@
+/*
+ * Chapter 09 layout: the workload switch, the chart beside its receipt, the receipts toggle, the way
+ * on. All of it set directly on the page, with one hairline between the chart and the receipt.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .controls {
+    margin-block-end: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  }
+
+  .grid {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .side {
+    min-inline-size: 0;
+  }
+
+  @media (min-width: 1100px) {
+    .grid {
+      grid-template-columns: minmax(0, 1.6fr) minmax(21rem, 1fr);
+      gap: clamp(2rem, 4vw, 5rem);
+    }
+
+    .side {
+      position: sticky;
+      inset-block-start: calc(var(--nav-h, 60px) + 2rem);
+      padding-inline-start: clamp(1.5rem, 3vw, 3.5rem);
+      border-inline-start: 1px solid var(--line-1);
+    }
+  }
+
+  .out {
+    max-inline-size: none;
+    margin: clamp(1.75rem, 1.25rem + 2vw, 3rem) 0 0;
+  }
+
+  .go {
+    font: 600 clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem) / 1.4 var(--font-display);
+  }
+
+  /* The last word and the arrow wrap together, so the arrow never strands at the far edge. */
+  .tail {
+    white-space: nowrap;
+  }
+
+  .tail svg {
+    display: inline-block;
+    margin-inline-start: 0.5em;
+    vertical-align: -0.16em;
+  }
+
+  .empty {
+    max-inline-size: 60ch;
+    margin: 0;
+    color: var(--text-2);
+    font-size: var(--fs-md);
+    line-height: 1.55;
+  }
+}

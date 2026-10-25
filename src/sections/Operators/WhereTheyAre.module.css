@@ -1,0 +1,24 @@
+/* The map beat: the tier words and the live mark in one row, then a map that runs edge to edge. */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+  }
+
+  .meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+  }
+
+  /* Out of the container and across the whole viewport: the page is clipped at its edges. */
+  .bleed {
+    inline-size: 100vw;
+    margin-inline: calc(50% - 50vw);
+  }
+}

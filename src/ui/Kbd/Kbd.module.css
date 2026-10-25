@@ -1,0 +1,19 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .kbd {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 1.75em;
+    block-size: 1.75em;
+    padding: 0 0.45em;
+    border: 1px solid var(--line-3);
+    border-block-end-width: 2px;
+    border-radius: var(--r-sm);
+    background: rgb(var(--ink-1-rgb) / 0.8);
+    color: var(--text-2);
+    font: 500 var(--fs-2xs) / 1 var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+}

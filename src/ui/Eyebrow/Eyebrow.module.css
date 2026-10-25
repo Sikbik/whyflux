@@ -1,0 +1,38 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    max-inline-size: none;
+    color: var(--accent-text);
+    font: 600 var(--fs-md) / 1.3 var(--font-display);
+    letter-spacing: 0;
+  }
+
+  .dot {
+    flex: none;
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    50% {
+      opacity: 0.3;
+    }
+  }
+
+  :global(html[data-motion="reduced"]) .dot {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not([data-motion="full"])) .dot {
+      animation: none;
+    }
+  }
+}

@@ -1,0 +1,10 @@
+@layer reset, tokens, base, ui, section, utility;
+
+@layer ui {
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+  }
+}

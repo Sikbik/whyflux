@@ -1,0 +1,75 @@
+/*
+ * The headline. The words live in the heading as real text (visually hidden, still read by screen
+ * readers and search); the canvas draws them as display type with current running over it. Without a
+ * 2D canvas the real words are shown as plain type. Flat colour only: no glow, no gradient.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .title {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    max-inline-size: none;
+    /* Air under the nav's ruler and label. */
+    margin: clamp(0.4rem, 2vh, 1.4rem) 0 0;
+    font-family: var(--font-display);
+    color: var(--text-1);
+  }
+
+  /* The sizing box: its height is set from the layout arithmetic, so it never shifts. */
+  .box {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+  }
+
+  /*
+   * Reaches past the box: across the whole hero, and up to its top edge, so bolts can arrive from beyond
+   * the letters. Under the lede and the buttons (a positioned canvas would paint over them), so a bolt
+   * that strays near them never crosses a word.
+   */
+  .canvas {
+    position: absolute;
+    z-index: -1;
+    max-inline-size: none;
+    pointer-events: none;
+  }
+
+  /* Visually hidden, still announced. */
+  .line {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .title[data-state="off"] .box {
+    display: none;
+  }
+
+  .title[data-state="off"] .line {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    display: block;
+    font-size: clamp(2.6rem, min(8.4vw, 14.5vh), 9.25rem);
+    font-weight: var(--fw-black);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .title[data-state="off"] .line:nth-child(2) {
+    color: var(--accent);
+  }
+}

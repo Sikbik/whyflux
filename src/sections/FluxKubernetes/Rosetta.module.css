@@ -1,0 +1,142 @@
+/*
+ * The Rosetta stone as type. Each pair is two lines: the Kubernetes term in a quiet grey, and under it
+ * what plays that role in Flux, in white. The chosen pair brightens and its arrow takes the accent;
+ * nothing is boxed, numbered or outlined. On a phone the list is a row of plain words.
+ */
+@layer reset, tokens, base, ui, section, utility;
+
+@layer section {
+  .list {
+    display: grid;
+    gap: 0.15rem;
+    min-inline-size: 0;
+  }
+
+  .row {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.6rem 0.25rem 0.65rem 0;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .k8s {
+    color: var(--text-3);
+    font: 400 clamp(0.75rem, 0.6rem + 0.15vw, 0.875rem) / 1.35 var(--font-sans);
+    letter-spacing: 0.01em;
+    transition: color var(--dur-2) var(--ease-out);
+  }
+
+  .flux {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    color: var(--text-3);
+    font: 500 clamp(0.9375rem, 0.4rem + 0.5vw, 1.125rem) / 1.3 var(--font-display);
+    transition: color var(--dur-2) var(--ease-out);
+  }
+
+  .arrow {
+    flex: none;
+    align-self: center;
+    color: var(--text-3);
+    transition:
+      color var(--dur-2) var(--ease-out),
+      translate var(--dur-2) var(--ease-out);
+  }
+
+  .row:hover .flux {
+    color: var(--text-2);
+  }
+
+  .row[data-on] .k8s {
+    color: var(--text-2);
+  }
+
+  .row[data-on] .flux {
+    color: var(--text-1);
+    font-weight: 600;
+  }
+
+  .row[data-on] .arrow {
+    color: var(--accent-strong);
+    translate: 2px 0;
+  }
+
+  .row:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+  }
+
+  /* Plain `code` inside a data string: mono, no box. */
+  .code {
+    font: 400 0.92em / 1 var(--font-mono);
+    color: inherit;
+  }
+
+  /* ---- the chosen pair, set big (layouts that list the Kubernetes terms alone) -------------------- */
+
+  .pair {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+  }
+
+  .pairK {
+    color: var(--text-3);
+    font: 400 var(--fs-sm) / 1.3 var(--font-sans);
+  }
+
+  .pairF {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    color: var(--text-1);
+    font: 600 clamp(1.25rem, 1.05rem + 1vw, 1.625rem) / 1.2 var(--font-display);
+  }
+
+  .pairF .arrow {
+    color: var(--accent-strong);
+  }
+
+  /* ---- phones and tablets: a scroller of plain words ---------------------------------------------- */
+
+  .list[data-phone] {
+    display: flex;
+    gap: 1.4rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding-block: 0.25rem;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scroll-snap-type: x proximity;
+  }
+
+  .list[data-phone]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .list[data-phone] .row {
+    flex: none;
+    padding: 0.65rem 0;
+    scroll-snap-align: center;
+    border-block-end: 2px solid transparent;
+    transition: border-color var(--dur-2) var(--ease-out);
+  }
+
+  .list[data-phone] .k8s {
+    color: var(--text-3);
+    font: 500 var(--fs-md) / 1.2 var(--font-display);
+    white-space: nowrap;
+  }
+
+  .list[data-phone] .row[data-on] {
+    border-block-end-color: var(--accent-strong);
+  }
+
+  .list[data-phone] .row[data-on] .k8s {
+    color: var(--text-1);
+  }
+}
