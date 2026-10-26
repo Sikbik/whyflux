@@ -231,7 +231,7 @@ from `src/data` keep the researchers' spelling and are not rewritten in the UI (
 
 ## 2. House rules (non-negotiable)
 
-These apply to every pixel, every chapter, forever. They come from the user.
+These apply to every pixel, every chapter, forever. They come from design review.
 
 ### 2.1 No gradient text, no decorative gradients (tightened by Restyle v2: also no glows, blobs or bloom)
 
@@ -857,7 +857,7 @@ over its top.
 from a baked Natural Earth mask, thin travelling arcs, a drag-to-spin planet with inertia, a hover label
 (country, tier, node count), a slow drift, and an ambient failover loop: now and then a site goes dark
 and the apps place a copy elsewhere. It is a **showcase, not the game**: nothing on it is clickable, it
-carries no "simulation" tag and no instructions (a decision by the user, section 13); the playable
+carries no "simulation" tag and no instructions (a design decision, section 13); the playable
 version is chapter 05. If real positions are unavailable it draws an illustrative network and says so
 in a small note. Glow is an accent: bloom 0.14 and a thin atmosphere, so the surface, the hex dots and
 the nodes read crisply on black.
@@ -1849,7 +1849,7 @@ the intents. Unknown values are ignored and fall back to the default.
 - **A WebGL note:** screenshots use SwiftShader (software), so frame rates are a floor, not a measurement.
 - **The OG card:** `tools/og.html` is a self-contained 1200 x 630 page (the `og-backdrop` plate, the symbol
   and the headline, no numbers) and `public/og.png` is rendered from it through the dev server:
-  `cd /tmp/whyflux-tools && node shot.mjs "http://127.0.0.1:5190/tools/og.html" /home/stache/.t3/projects/whyflux/public/og.png --w 1200 --h 630 --wait 1800`.
+  `cd /tmp/whyflux-tools && node shot.mjs "http://127.0.0.1:5190/tools/og.html" <repo>/public/og.png --w 1200 --h 630 --wait 1800`.
   Re-render it if the headline changes.
 
 ---
@@ -1887,7 +1887,7 @@ None of these blocks a chapter: each chapter renders without them and says what 
 | 2026-10-24 | Chapter 03 shows Docker, Git (Orbit) and an AI agent (MCP) as three equal on-ramps | User |
 | 2026-10-24 | The hero globe is a showcase: no click to knock out, no "Simulation" tag, no instruction captions, glow turned down to an accent. The tooltip shows only location, tier and node count | User |
 | 2026-10-24 | New chapter `sealed` (07, nav "Privacy", act III) after Operators; later chapters renumbered | User |
-| 2026-10-24 | The hex-pixel hero headline is replaced by crisp Archivo display type with procedural lightning (hard to read and awkward, per the user) | User, Design |
+| 2026-10-24 | The hex-pixel hero headline is replaced by crisp Archivo display type with procedural lightning (hard to read and awkward in review) | Review, Design |
 | 2026-10-24 | The electric headline direction is approved. Current runs behind the letters (never across a word), starts below the fixed header, and a tap counts when the press ends | User, Design |
 | 2026-10-24 | The hero keeps a quiet ambient failover loop (no controls, no claims); it is one switch (`ambientFailover`) if it should go. Where real positions are missing the globe says "Illustrative node positions" | Design |
 | 2026-10-24 | The hero's four numbers are a bar at the foot of the planet, not a panel, so the globe is visible | Design |
