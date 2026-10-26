@@ -3,7 +3,7 @@
 # whyflux
 
 **Why Flux**: an interactive case for the [Flux](https://runonflux.com) decentralized cloud.
-Live at **https://whyflux.stache.beer**
+Live on Flux at **https://whyflux.app.runonflux.io** (also at https://whyflux.stache.beer)
 
 Pull the plug, it keeps running. The page walks through why web2 hosting is fragile, how Flux
 works as a decentralized Kubernetes, how a deployment goes from a Docker image, a Git repo or an
@@ -31,7 +31,17 @@ npm run build      # static site in dist/
 
 ## Deploy
 
-`deploy/deploy.sh` refreshes the snapshot, builds and publishes to whyflux.stache.beer.
+The site runs on Flux itself, at https://whyflux.app.runonflux.io: two instances of the
+`littlestache/whyflux` image on independent nodes.
+
+```sh
+docker build -t littlestache/whyflux:latest .   # static build served by unprivileged nginx on 8080
+docker run --rm -p 8080:8080 littlestache/whyflux:latest
+```
+
+The Flux app pulls `:latest`, so shipping a build is a push and a soft redeploy.
+
+`deploy/deploy.sh` refreshes the snapshot, builds and publishes the same site to whyflux.stache.beer.
 See `deploy/README.md`.
 
 ## Docs
