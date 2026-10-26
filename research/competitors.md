@@ -1162,7 +1162,7 @@ Researched 2026-10-24. Wherever a provider post-incident report (PIR) exists, it
   - EC2 fully recovered at 20:50 UTC and NLB at 21:09 UTC.
   - Redshift tail: not fully restored until 4:05 AM PDT Oct 21 (11:05 UTC), ~28 h after the start.
   - Parametrix splits it into a severe first phase of "approximately 2 hours and 36 minutes" and a fragmented second phase of 7.5 h ([Insurance Edge](https://insurance-edge.net/2025/10/30/parametrix-estimates-aws-outage-costs/)).
-  - The user's example of "07:11 UTC" is AWS's first public status post (12:11 AM PDT). The PES puts the actual start at 06:48 UTC.
+  - The often-quoted "07:11 UTC" is AWS's first public status post (12:11 AM PDT). The PES puts the actual start at 06:48 UTC.
 - **Affected services (reputable sources):**
   - Snapchat, Reddit: Reuters via [The Insurer](https://www.theinsurer.com/cyber-risk/news/amazons-aws-recovering-after-major-outage-disrupts-apps-services-worldwide-2025-10-20).
   - Robinhood, Coinbase, Perplexity: Reuters via [Jakarta Post](https://www.thejakartapost.com/culture/2025/10/20/amazons-cloud-unit-reports-outage-several-websites-down.html).

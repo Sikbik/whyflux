@@ -11,7 +11,7 @@ Owner: Flux research pass. Compiled 2026-10-24. Every live number below was read
 | [RunOnFlux/fluxwhitepaper](https://github.com/RunOnFlux/fluxwhitepaper) | `6869738` | 2026-09-08 | Benchmark thresholds, monetary policy |
 | [RunOnFlux/flux-docs](https://github.com/RunOnFlux/flux-docs) (docs.runonflux.com) | `71f936d` | 2026-10-21 | Official docs (several stale numbers, see "Claims to avoid") |
 
-Cross-checked against the user's own research for Flux Atlas (`/tmp/whyflux-refs/Flux_Atlas/docs/research/flux-api.md`, 2026-09-30) and Flux Academy (`/tmp/whyflux-refs/flux-academy/docs/research/FACTS.md`, 2026-10-12/13). Where they and today's reading differ, today's reading wins and the difference is noted.
+Cross-checked against the research notes in the Flux Atlas repo (`docs/research/flux-api.md`, 2026-09-30) and the Flux Academy repo (`docs/research/FACTS.md`, 2026-10-12/13). Where they and today's reading differ, today's reading wins and the difference is noted.
 
 Rule of thumb when writing copy: **source code and live endpoints beat docs and marketing pages.** The official docs still carry 2025 numbers (10,000+ nodes, 66 countries, "three or more FluxNodes") that are no longer true.
 
@@ -154,7 +154,7 @@ The sequence below is what the code does (FluxOS `9bb1419` unless stated), in th
 
 Times: the UI says nodes "usually start installing within 1 to 3 minutes" and shows "Deployment time: up to 45 min after payment" as a static estimate; the code allows up to ~2 h for a small app to be picked up by the larger tiers (Academy FACTS §6.1, §6.6). Copy should say "minutes", not a guaranteed number.
 
-**Instances: what is the default?** This settles a point the brief assumed.
+**Instances: what is the default?** This settles a common assumption.
 
 - FluxOS validator ([appValidator.js L804-813](https://github.com/RunOnFlux/flux/blob/9bb1419690914b1fe98209b56a6c3638b7d11c5c/ZelBack/src/services/appRequirements/appValidator.js#L804-L813)) and config ([default.js L430-434](https://github.com/RunOnFlux/flux/blob/9bb1419690914b1fe98209b56a6c3638b7d11c5c/ZelBack/config/default.js#L430-L434)):
   ```js

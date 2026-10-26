@@ -19,7 +19,7 @@ Independent source: the [Halborn ArcaneOS assessment](https://www.halborn.com/au
 
 **Can a Flux node operator spy on my app?** On an ArcaneOS node (about 94% of the network), the operator has no root, no shell and, since FluxOS 8.18.0 (2026-09-08), no FluxOS API path into your app's files, logs, environment variables or terminal, and the disk is encrypted. That stops ordinary and opportunistic snooping. It is **not** confidential computing, though. There is no hardware enclave, so a determined operator who controls the hypervisor or the hardware could still read memory. Default web traffic reaches the node as plain HTTP across the operator's network. InFlux (Flux's company) can itself decrypt private app specs and open a shell in any app. On the ~6% of legacy nodes the operator is root and sees everything.
 
-So the user's belief ("ArcaneOS protects the apps and encrypts them so node operators can't even spy on the applications hosted") is **directionally right but too absolute**. Say "locked out", not "can't spy". Scope it to ArcaneOS and to private apps. Keep the three exceptions (hypervisor and physical access, traffic, Flux itself) in the fine print.
+So the common belief ("ArcaneOS protects the apps and encrypts them so node operators can't even spy on the applications hosted") is **directionally right but too absolute**. Say "locked out", not "can't spy". Scope it to ArcaneOS and to private apps. Keep the three exceptions (hypervisor and physical access, traffic, Flux itself) in the fine print.
 
 ---
 
